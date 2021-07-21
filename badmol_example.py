@@ -9,3 +9,6 @@ calculator = GAUSSIAN(mol,runtype='opt_freq',nproc=16,mem=120,jobname='opt_badmo
 mol = Run(calculator)
 
 print('Optimized the geometry successfully')
+
+print('test')
+print('test again')
