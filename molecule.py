@@ -156,7 +156,7 @@ class Mol:
     def copy(self):
         return(deepcopy(self))
 
-    def refine_conformers(self,calculator_class,jobname,**kwargs):
+    def RefineConformers(self,calculator_class,jobname,**kwargs):
         '''take in a generic calculator to apply to each conformer
         then re-rank the conformers with relative energies'''
 
