@@ -1,9 +1,9 @@
-from workflow import molecule
-from workflow.crest import CREST
-from workflow.gaussian import GAUSSIAN
-from workflow.calculator import Run,RunBatch
+from . import molecule
+from .software.CREST import CREST
+from .software.GAUSSIAN import GAUSSIAN
+from .calculator import Run,RunBatch
 
-from workflow.utils import parallelize
+from .utils import parallelize
 import os
 
 
