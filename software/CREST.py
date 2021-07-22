@@ -1,13 +1,13 @@
 #interface with CREST
 
-from . import calculator
-from . import molecule
-from .config import * #this is where the crest exe is defined
+from .. import calculator
+from .. import molecule
+from ..config import * #this is where the crest exe is defined
 import re
 import numpy as np
-from .utils import cleaner
-from .message import warning,log,display
-from .config import max_conformers
+from ..utils import cleaner
+from ..message import warning,log,display
+from ..config import max_conformers
 
 
 

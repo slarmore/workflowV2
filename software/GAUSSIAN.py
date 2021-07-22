@@ -1,12 +1,12 @@
 #interface with GAUSSIAN
 from shutil import Error
-from . import calculator
-from . import molecule
-from .config import * #this is where the g16 exe is defined
+from .. import calculator
+from .. import molecule
+from ..config import * #this is where the g16 exe is defined
 import re
 import numpy as np
-from .utils import cleaner
-from .message import warning,log,display
+from ..utils import cleaner
+from ..message import warning,log,display
 
 
 def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partition=default_partition,oldchk=None,**kwargs):
@@ -150,7 +150,7 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partitio
                 mol=mol))
 
 
-def GAUSSIAN_fixerrors(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partition=default_partition,oldchk=None,maxtries=3,TS=False**kwargs):
+def GAUSSIAN_fixerrors(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partition=default_partition,oldchk=None,maxtries=3,TS=False,**kwargs):
     mol.warnings = ['first_submission']
     tries = 0
     while len(mol.warnings) > 0:
@@ -209,7 +209,7 @@ def fix_errors(mol,kwargs,TS):
         #check for saddle point
         if 'frequencies' in mol.properties:
             if mol.properties['frequencies'][1] < 0:
-                print('Fixed saddle point')
+                log('Fixed saddle point')
                 if 'opt' in kwargs:
                     current = kwargs['opt']
                     if not re.search('readfc',current):
@@ -269,8 +269,6 @@ class gaussian:
             #for each line, check if any keywords are found
             #if so, use the matching function to update the mol object
             for line_number,line in enumerate(output_lines):
-                if re.search('Coordinate',line):
-                    print('should have found geom...')
                 for key,key_regrex in zip(self.keys,self.keys_regrexs):
                     if key_regrex.search(line):
                         self.keywords[key](calculator.mol,line_number,line,output_lines,calculator)

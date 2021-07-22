@@ -115,7 +115,9 @@ class Mol:
             if stop is None:
                 stop = len(self.conformers) + 1
             out = []
-            for conf in self.conformers[start:stop]:
+            for i,conf in enumerate(self.conformers[start:stop]):
+                if i > 0:
+                    out.append('')
                 out_sub = [str(conf.natoms)]
                 if 'title' in self.tags:
                     out_sub.append(str('{0} - {1}'.format(self.tags['title'],conf.energy)))
@@ -154,18 +156,18 @@ class Mol:
     def copy(self):
         return(deepcopy(self))
 
-    def refine_conformers(self,calculator_class,jobname,**kwargs):
+    def RefineConformers(self,calculator_class,jobname,**kwargs):
         '''take in a generic calculator to apply to each conformer
         then re-rank the conformers with relative energies'''
 
         #take the generic calculator and apply it to each conformre
-        calculators = [calculator_class(conf,title=jobname+'{0}'.format(index+1),**kwargs) for index,conf in enumerate(self.conformers)]
+        calculators = [calculator_class(conf,jobname=jobname+'{0}'.format(index+1),**kwargs) for index,conf in enumerate(self.conformers)]
         
         conformers = calculator.RunBatch(calculators,jobname)
         conformers.sort(key=lambda x: x.energy)
-        energies = np.array([conf.energy for conf in self.conformers])
+        energies = np.array([conf.energy for conf in conformers])
         energies = energies - energies[0]
-        energies = hartree2kcal(energies)
+        energies = np.vectorize(hartree2kcal)(energies)
         
         #assign back on the mol
         self.conformers = conformers
