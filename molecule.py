@@ -70,7 +70,11 @@ class Mol:
         xyzstring=[]
         for line in self.xyz:
             #need to prevent writing out scientific notation by specifying number of decimals
+<<<<<<< HEAD
             line = ['{:.7f}'.format(value) if type(value) == np.float else value for value in line]
+=======
+            line = ['{:.7f}'.format(value) if type(value) != str else value for value in line]
+>>>>>>> 55c19758cd0494e127028cfad6079ee480e58d40
             xyzstring.append('      '.join(line))
         self.xyzstring = '\n'.join(xyzstring)
 
