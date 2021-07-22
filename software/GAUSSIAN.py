@@ -1,12 +1,12 @@
 #interface with GAUSSIAN
 from shutil import Error
-from . import calculator
-from . import molecule
-from .config import * #this is where the g16 exe is defined
+from .. import calculator
+from .. import molecule
+from ..config import * #this is where the g16 exe is defined
 import re
 import numpy as np
-from .utils import cleaner
-from .message import warning,log,display
+from ..utils import cleaner
+from ..message import warning,log,display
 
 
 def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partition=default_partition,oldchk=None,**kwargs):
