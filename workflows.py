@@ -28,7 +28,7 @@ def get_lowest_conformer(smiles,name=None):
     os.makedirs('conf_search',exist_ok=True)
     os.chdir('conf_search')
 
-    crest_conformer_calculator = CREST(mol,title='{0}-crest'.format(name),runtype='confsearch',nproc=16,mem=120,time='1-00:00:00',partition='short,lopez',gbsa='water',ewin=500)
+    crest_conformer_calculator = CREST(mol,jobname='{0}-crest'.format(name),runtype='confsearch',nproc=16,mem=120,time='1-00:00:00',partition='short,lopez',gbsa='water',ewin=500)
 
     mol = Run(crest_conformer_calculator)
 
