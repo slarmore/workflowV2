@@ -57,7 +57,8 @@ class Mol:
     def get_xyz(self):
         xyz = []
         for index,atom in enumerate(self.atoms):
-            xyz.append([atom,self.coords[index][0],self.coords[index][1],self.coords[index][2]])
+            #need to prevent writing out scientific notation by specifying number of decimals
+            xyz.append([atom,'{:.7f}'.format(self.coords[index][0]),'{:.7f}'.format(self.coords[index][1]),'{:.7f}'.format(self.coords[index][2])])
         self.xyz = np.array(xyz)
 
     def get_rdkitmol(self):
@@ -69,8 +70,6 @@ class Mol:
     def get_xyzstring(self):
         xyzstring=[]
         for line in self.xyz:
-            #need to prevent writing out scientific notation by specifying number of decimals
-            line = ['{:.7f}'.format(value) if type(value) == np.float64 else value for value in line]
             print(line)
             xyzstring.append('      '.join(line))
         self.xyzstring = '\n'.join(xyzstring)
