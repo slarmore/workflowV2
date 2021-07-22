@@ -209,7 +209,7 @@ def fix_errors(mol,kwargs,TS):
         #check for saddle point
         if 'frequencies' in mol.properties:
             if mol.properties['frequencies'][1] < 0:
-                print('Fixed saddle point')
+                log('Fixed saddle point')
                 if 'opt' in kwargs:
                     current = kwargs['opt']
                     if not re.search('readfc',current):
@@ -269,8 +269,6 @@ class gaussian:
             #for each line, check if any keywords are found
             #if so, use the matching function to update the mol object
             for line_number,line in enumerate(output_lines):
-                if re.search('Coordinate',line):
-                    print('should have found geom...')
                 for key,key_regrex in zip(self.keys,self.keys_regrexs):
                     if key_regrex.search(line):
                         self.keywords[key](calculator.mol,line_number,line,output_lines,calculator)
