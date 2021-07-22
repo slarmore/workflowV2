@@ -41,7 +41,7 @@ def get_lowest_conformer(smiles,name=None):
     os.makedirs('SP',exist_ok=True)
     os.chdir('SP')
 
-    mol.refine_conformers(GAUSSIAN,nproc=16,mem=120,jobname='{0}-sp-refine-conformers'.format(name),runtype='sp',method='B3LYP/6-31G',empiricaldispersion='GD3bj')
+    mol.RefineConformers(GAUSSIAN,nproc=16,mem=120,jobname='{0}-sp-refine-conformers'.format(name),runtype='sp',method='B3LYP/6-31G',empiricaldispersion='GD3bj')
 
     os.chdir('../')
 
@@ -56,7 +56,7 @@ def get_lowest_conformer(smiles,name=None):
     if len(mol.conformers) > 10:
         mol.conformers = mol.conformers[0:10]
 
-    mol.refine_conformers(GAUSSIAN,nproc=16,mem=120,jobname='{0}-opt-refine-conformers'.format(name),runtype='opt_freq',method='B3LYP/6-31G',empiricaldispersion='GD3bj',opt='calcfc')
+    mol.RefineConformers(GAUSSIAN,nproc=16,mem=120,jobname='{0}-opt-refine-conformers'.format(name),runtype='opt_freq',method='B3LYP/6-31G',empiricaldispersion='GD3bj',opt='calcfc')
 
     os.chdir('../')
 
@@ -68,6 +68,7 @@ def get_lowest_conformer(smiles,name=None):
     os.chdir('lowest_energy_conformers')
 
     mol.conformers[0].ToXYZ('{0}-lowestconf.xyz'.format(name))
+    mol.ConformersToXYZ('{0}-allconf.xyz'.format(name))
 
     os.chdir('../')
 
