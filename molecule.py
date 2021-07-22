@@ -165,7 +165,7 @@ class Mol:
         
         conformers = calculator.RunBatch(calculators,jobname)
         conformers.sort(key=lambda x: x.energy)
-        energies = np.array([conf.energy for conf in self.conformers])
+        energies = np.array([conf.energy for conf in conformers])
         print(energies)
         energies = energies - energies[0]
         print(energies)
