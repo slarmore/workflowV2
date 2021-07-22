@@ -115,7 +115,9 @@ class Mol:
             if stop is None:
                 stop = len(self.conformers) + 1
             out = []
-            for conf in self.conformers[start:stop]:
+            for i,conf in enumerate(self.conformers[start:stop]):
+                if i > 0:
+                    out.append('')
                 out_sub = [str(conf.natoms)]
                 if 'title' in self.tags:
                     out_sub.append(str('{0} - {1}'.format(self.tags['title'],conf.energy)))
@@ -164,8 +166,11 @@ class Mol:
         conformers = calculator.RunBatch(calculators,jobname)
         conformers.sort(key=lambda x: x.energy)
         energies = np.array([conf.energy for conf in self.conformers])
+        print(energies)
         energies = energies - energies[0]
-        energies = hartree2kcal(energies)
+        print(energies)
+        energies = np.vectorize(hartree2kcal)(energies)
+        print(energies)
         
         #assign back on the mol
         self.conformers = conformers
