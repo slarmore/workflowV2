@@ -150,7 +150,7 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partitio
                 mol=mol))
 
 
-def GAUSSIAN_fixerrors(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partition=default_partition,oldchk=None,maxtries=3,TS=False**kwargs):
+def GAUSSIAN_fixerrors(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partition=default_partition,oldchk=None,maxtries=3,TS=False,**kwargs):
     mol.warnings = ['first_submission']
     tries = 0
     while len(mol.warnings) > 0:
