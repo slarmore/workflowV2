@@ -70,7 +70,6 @@ class Mol:
     def get_xyzstring(self):
         xyzstring=[]
         for line in self.xyz:
-            print(line)
             xyzstring.append('      '.join(line))
         self.xyzstring = '\n'.join(xyzstring)
 
