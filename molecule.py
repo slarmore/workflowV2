@@ -69,7 +69,8 @@ class Mol:
     def get_xyzstring(self):
         xyzstring=[]
         for line in self.xyz:
-            line = ['{.7f}'.format(value) for value in line]
+            #need to prevent writing out scientific notation by specifying number of decimals
+            line = ['{:.7f}'.format(value) if type(value) == np.float else value for value in line]
             xyzstring.append('      '.join(line))
         self.xyzstring = '\n'.join(xyzstring)
 
