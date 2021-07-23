@@ -161,13 +161,13 @@ def GAUSSIAN_fixerrors(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00
             kwargs = fix_errors(mol,kwargs,TS)
 
         log('{0} submission {1}'.format(jobname,tries))
-        calculator = GAUSSIAN(mol,jobname='{0}-{1}'.format(jobname,tries),runtype=runtype,method=method,nproc=nproc,mem=mem,time=time,partition=partition,oldchk=oldchk,**kwargs)
+        calculator_obj = GAUSSIAN(mol,jobname='{0}-{1}'.format(jobname,tries),runtype=runtype,method=method,nproc=nproc,mem=mem,time=time,partition=partition,oldchk=oldchk,**kwargs)
         oldchk = '{0}-{1}/{0}-{1}.chk'.format(jobname,tries)
 
         if tries > maxtries:
             raise Error('Ran out of fixerror tries')
 
-        mol = calculator.Run(calculator)
+        mol = calculator.Run(calculator_obj)
 
 def GAUSSIAN_fixerrors_batch(mols,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partition=default_partition,oldchk=None,maxtries=3,TS=False,**kwargs):
     if oldchk is None:
