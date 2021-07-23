@@ -98,9 +98,9 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partitio
         com.append('--Link1--')
 
         #add geom=check guess=read if not already present in the original route
-        if not re.search(route,'geom=(check)'):
+        if not re.search('geom=(check)',route):
             route += 'geom=(check)'
-        if not re.search(route,'guess=(read)'):
+        if not re.search('guess=(read)',route):
             route += 'guess=(read)'
 
         com.extend(['%chk={0}.chk'.format(jobname),
