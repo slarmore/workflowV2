@@ -7,6 +7,7 @@ import re
 import numpy as np
 from ..utils import cleaner
 from ..message import warning,log,display
+import os
 
 
 def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partition=default_partition,oldchk=None,**kwargs):
@@ -75,7 +76,7 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partitio
         com = []
         #only include oldchk on the optimization step 
         if oldchk is not None:
-            com.append('%oldchk={0}'.format(oldchk))
+            com.append('%oldchk={0}'.format(os.path.abspath(oldchk)))
         
         com.extend(['%chk={0}.chk'.format(jobname),
                 '%nprocs={0}'.format(nproc),
@@ -113,7 +114,7 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partitio
         com = []
         #only include oldchk on the optimization step 
         if oldchk is not None:
-            com.append('%oldchk={0}'.format(oldchk))
+            com.append('%oldchk={0}'.format(os.path.abspath(oldchk)))
         
         com.extend(['%chk={0}.chk'.format(jobname),
                 '%nprocs={0}'.format(nproc),
