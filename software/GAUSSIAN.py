@@ -315,7 +315,7 @@ class gaussian:
             calculator.mol.properties={}
             calculator.mol.warnings = []
             #remove the unessesary leftover files
-            matches = ['{0}.chk'.format(calculator.jobname)]
+            matches = ['Gau*']
             #add the directory
             matches = [calculator.dir + match for match in matches]
             cleaner(matches)
