@@ -96,10 +96,17 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partitio
         
         #start the freq step input
         com.append('--Link1--')
+
+        #add geom=check guess=read if not already present in the original route
+        if not re.search(route,'geom=(check)'):
+            route += 'geom=(check)'
+        if not re.search(route,'guess=(read)'):
+            route += 'guess=(read)'
+
         com.extend(['%chk={0}.chk'.format(jobname),
                 '%nprocs={0}'.format(nproc),
                 '%mem={0}GB'.format(mem),
-                '# {0} {1} {2} geom=check guess=read'.format(method,runcommands[1],route),    #freq will be the second run command in the list
+                '# {0} {1} {2}'.format(method,runcommands[1],route),    #freq will be the second run command in the list
                 '',
                 jobname,
                 '',
