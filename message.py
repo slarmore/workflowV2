@@ -38,6 +38,7 @@ def warning(string):
 
         if __logfile__ is None:
             sys.stderr.write(string)
+            sys.stdout.flush()
         else:
             with open(__logfile__,'a') as log:
                 log.write(string)
@@ -55,6 +56,7 @@ def log(string):
 
         if __logfile__ is None:
             sys.stdout.write(string)
+            sys.stdout.flush()
         else:
             with open(__logfile__,'a') as log:
                 log.write(string)
