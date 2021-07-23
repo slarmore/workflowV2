@@ -167,7 +167,47 @@ def GAUSSIAN_fixerrors(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00
         if tries > maxtries:
             raise Error('Ran out of fixerror tries')
 
-        mol = Run(calculator)
+        mol = calculator.Run(calculator)
+
+def GAUSSIAN_fixerrors_batch(mols,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partition=default_partition,oldchk=None,maxtries=3,TS=False,**kwargs):
+    if oldchk is None:
+        oldchk = [None for mol in mols]
+    
+    else:
+        if len(oldchk) != len(mols):
+            raise IndexError('The same number of molecules and oldchk files must be given. Use None for mols that do not need oldchks')
+    
+    for mol in mols:
+        mol.warnings = ['first_submission']
+
+    tries = 0 
+
+    need_submissions = [mol for mol in mols]
+
+    while len(need_submissions) > 0:
+        tries += 1
+
+        #make fixes based on the warnings in mol.warnings
+        if tries > 1:
+            kwargs = [fix_errors(mol,kwargs[index],TS) if mol in need_submissions else kwargs[index] for index,mol in enumerate(mols)]
+        else:
+            kwargs = [kwargs.copy() for mol in mols]
+
+        log('{0} submission {1}'.format(jobname,tries))
+        calculators = [GAUSSIAN(mol,jobname='{0}-{1}-try{2}'.format(jobname,index,tries),runtype=runtype,method=method,nproc=nproc,mem=mem,time=time,partition=partition,oldchk=oldchk[index],**kwargs[index]) for index,mol in enumerate(mols)]
+        oldchk = ['{0}-{1}-try{2}/{0}-{1}-try{2}.chk'.format(jobname,index,tries) for index,mol in enumerate(mols)]
+
+        if tries > maxtries:
+            raise Error('Ran out of fixerror tries')
+        
+        need_submissions = []
+        for mol in mols:
+            if len(mol.warnings) > 0:
+                need_submissions.append(mol)
+
+        mol = calculator.RunBatch(calculators)
+
+
     
 
 def fix_errors(mol,kwargs,TS):
@@ -187,6 +227,7 @@ def fix_errors(mol,kwargs,TS):
                 kwargs['opt'] = 'readfc'
 
             kwargs['geom'] = 'check'
+            kwargs['guess'] = 'read'
 
         else:
             if 'opt' in kwargs:
@@ -205,21 +246,34 @@ def fix_errors(mol,kwargs,TS):
         else:
             kwargs['scf'] = 'qc'
     
-    if TS:
+    if 'negative_frequency' in mol.warnings:
+        if TS:
         #check for saddle point
-        if 'frequencies' in mol.properties:
-            if mol.properties['frequencies'][1] < 0:
-                log('Fixed saddle point')
-                if 'opt' in kwargs:
-                    current = kwargs['opt']
-                    if not re.search('readfc',current):
-                        kwargs['opt'] = current + ',readfc'
+            if 'frequencies' in mol.properties:
+                if mol.properties['frequencies'][1] < 0:
+                    log('Fixed saddle point')
+                    if 'opt' in kwargs:
+                        current = kwargs['opt']
+                        if not re.search('readfc',current):
+                            kwargs['opt'] = current + ',readfc'
+                
+                    kwargs['geom'] = 'check'
+                    kwargs['guess'] = 'read'
+    
+        else:
+        #check for TS
+            log('Fixed negative frequency')
+            if 'opt' in kwargs:
+                current = kwargs['opt']
+                if not re.search('readfc',current):
+                    kwargs['opt'] = current + ',readfc'
             else:
                 kwargs['opt'] = 'readfc'
 
+            kwargs['geom'] = 'check'
+            kwargs['guess'] = 'read'
+
     return(kwargs)
-
-
 
 
 
@@ -431,7 +485,28 @@ def frequencies(mol,line_number,line,output_lines,calculator):
 
     mol.properties['frequencies'] = freqs
 
-    "Frequencies"
+    if freqs[1] < 0:
+        warning('''Saddle point found for {0}
+
+        The mol.warnings = ['negative_frequency']
+        
+        It's reccomended to resubmit reading the force constants in
+        
+        '''.format(calculator.jobname))
+
+        mol.warnings.append('negative_frequency')
+
+    elif freqs[0] < 0:
+        warning('''Negative frequency present for {0}
+
+        The mol.warnings = ['negative_frequency']
+        
+        Ignore if this is a TS, otherwise it's reccomended
+        to resubmit reading the force constants in
+        
+        '''.format(calculator.jobname))
+
+        mol.warnings.append('negative_frequency')
 
 
 def opt(outputfile):
