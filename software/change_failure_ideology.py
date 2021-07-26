@@ -263,7 +263,7 @@ class gaussian:
         return(calculator.mol)
 
 
-    def fix_errors(mol,kwargs):
+    def fix_errors(self,mol,kwargs):
 
         #not very elegant, but loop through the list and 
         #add keywords to fix any known errors
