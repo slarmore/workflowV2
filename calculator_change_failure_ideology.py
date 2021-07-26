@@ -40,10 +40,10 @@ class Calculator:
 
         #file io
         self.dir = os.path.abspath(jobname) + '/'
-        self.inputfile_full = self.dir +  self.jobname + 'try{0}'.format(try_count) + '.' + self.program.infiles[0]
-        self.outputfile_full = self.dir +  self.jobname + 'try{0}'.format(try_count) + '.' + self.program.outfiles[0]
-        self.inputfile_relative = self.jobname + 'try{0}'.format(try_count) + '.' + self.program.infiles[0]
-        self.outputfile_relative = self.jobname + 'try{0}'.format(try_count) + '.' + self.program.outfiles[0]
+        self.inputfile_full = self.dir +  self.jobname + '-try{0}'.format(try_count) + '.' + self.program.infiles[0]
+        self.outputfile_full = self.dir +  self.jobname + '-try{0}'.format(try_count) + '.' + self.program.outfiles[0]
+        self.inputfile_relative = self.jobname + '-try{0}'.format(try_count) + '.' + self.program.infiles[0]
+        self.outputfile_relative = self.jobname + '-try{0}'.format(try_count) + '.' + self.program.outfiles[0]
 
         #input file
         self.input = input
