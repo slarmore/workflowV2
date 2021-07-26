@@ -288,7 +288,7 @@ class gaussian:
 
                 kwargs['geom'] = 'check'
                 kwargs['guess'] = 'read'
-                kwargs['oldchk'] = ['{0}.chk'.format(input_name)]
+                kwargs['oldchk'] = '{0}.chk'.format(input_name)
 
             else:
                 if 'opt' in kwargs:
@@ -321,7 +321,7 @@ class gaussian:
                     
                         kwargs['geom'] = 'check'
                         kwargs['guess'] = 'read'
-                        kwargs['oldchk'] = ['{0}.chk'.format(input_name)]
+                        kwargs['oldchk'] = '{0}.chk'.format(input_name)
         
             else:
             #check for TS
@@ -335,7 +335,7 @@ class gaussian:
 
                 kwargs['geom'] = 'check'
                 kwargs['guess'] = 'read'
-                kwargs['oldchk'] = ['{0}.chk'.format(input_name)]
+                kwargs['oldchk'] = '{0}.chk'.format(input_name)
 
         return(kwargs)
 
