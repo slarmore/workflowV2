@@ -1,6 +1,7 @@
 #interface with GAUSSIAN
 from shutil import Error
 from .. import calculator
+from .. import calculator_change_failure_ideology
 from .. import molecule
 from ..config import * #this is where the g16 exe is defined
 import re
@@ -184,7 +185,7 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partitio
     argument_dict['TS'] = TS
 
     #return the calculator object to either run with calculator.Run or calculator.RunBatch
-    return(calculator.Calculator(jobname=jobname,
+    return(calculator_change_failure_ideology.Calculator(jobname=jobname,
                 input=input,
                 command=command,
                 nproc=nproc,
