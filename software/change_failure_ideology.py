@@ -11,7 +11,7 @@ from ..message import warning,log,display
 import os
 
 
-def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partition=default_partition,oldchk=None,TS=False,**kwargs):
+def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partition=default_partition,oldchk=None,TS=False,try_count=0**kwargs):
     '''This function takes in a mol object and creates a calculator 
     object that can preform the requested calculation given 
     the setup here
