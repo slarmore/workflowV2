@@ -25,6 +25,14 @@ class Calculator:
                 mol,
                 argument_dict,
                 try_count):
+
+        #slurm inputs
+        self.nproc = nproc
+        self.mem = mem
+        self.time = time
+        self.partition = partition
+        self.program = program
+        self.jobname = jobname
         
         #file io
         self.dir = os.path.abspath(jobname) + '/'
@@ -49,14 +57,6 @@ class Calculator:
         #replace the generic command with the input/output files
         self.command = self.command.replace('INPUTFILE',self.inputfile_relative)
         self.command = self.command.replace('OUTPUTFILE',self.outputfile_relative)
-        
-        #slurm inputs
-        self.nproc = nproc
-        self.mem = mem
-        self.time = time
-        self.partition = partition
-        self.program = program
-        self.jobname = jobname
 
         #always return a modified copy of the mol, rather than the modifying the mol itself
         self.mol = mol.copy()
