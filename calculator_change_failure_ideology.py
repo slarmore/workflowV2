@@ -7,7 +7,6 @@ from . import molecule
 import numpy as np
 from .utils import cleaner
 from .message import warning,log,display
-from config import default_parition,default_time,default_mem,default_nproc
 
 
 class Calculator:
