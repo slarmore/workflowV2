@@ -221,6 +221,8 @@ class gaussian:
         self.keys_regrexs = [re.compile(key) for key in self.keys]
 
     def resubmit(self,mol,jobname,kwargs,try_count):
+        display('arguments passed')
+        display(kwargs)
         return(GAUSSIAN(mol,jobname,**kwargs,try_count=try_count))
 
     def read_output(self,calculator,slurmoutput):
