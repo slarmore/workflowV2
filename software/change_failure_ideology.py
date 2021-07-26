@@ -27,6 +27,9 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partitio
         else:
             raise TypeError('Expected Mol or Conformer object')
 
+    directory = os.path.abspath(jobname) + '/'
+    basename_full = directory +  jobname + '-try{0}'.format(try_count) 
+
 
     #supported Gaussian runtypes
     supported_runtypes = {
@@ -108,7 +111,7 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partitio
         if oldchk is not None:
             com.append('%oldchk={0}'.format(os.path.abspath(oldchk)))
         
-        com.extend(['%chk={0}.chk'.format(jobname),
+        com.extend(['%chk={0}.chk'.format(basename_full),
                 '%nprocs={0}'.format(nproc),
                 '%mem={0}GB'.format(mem),
                 '# {0} {1} {2}'.format(method,runcommands[0],route),      #opt will be the first run command in the list
@@ -133,7 +136,7 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partitio
         if not re.search('guess=\(read\)',route):
             route += ' guess=(read)'
 
-        com.extend(['%chk={0}.chk'.format(jobname),
+        com.extend(['%chk={0}.chk'.format(basename_full),
                 '%nprocs={0}'.format(nproc),
                 '%mem={0}GB'.format(mem),
                 '# {0} {1} {2}'.format(method,runcommands[1],route),    #freq will be the second run command in the list
@@ -153,7 +156,7 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partitio
         if oldchk is not None:
             com.append('%oldchk={0}'.format(os.path.abspath(oldchk)))
         
-        com.extend(['%chk={0}.chk'.format(jobname),
+        com.extend(['%chk={0}.chk'.format(basename_full),
                 '%nprocs={0}'.format(nproc),
                 '%mem={0}GB'.format(mem),
                 '# {0} {1} {2}'.format(method,' '.join(runcommands),route),    #concatenate the list of run commands
