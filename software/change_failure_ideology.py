@@ -260,13 +260,7 @@ class gaussian:
 
             output.close()
 
-        if calculator.resubmit:
-            if len(calculator.mol.wargnings) > 0:
-                return(calculator.mol,True)
-            else:
-                return(calculator.mol,False)
-        else:
-            return(calculator.mol,False)
+        return(calculator.mol,False)
 
 
     def fix_errors(mol,kwargs,TS):
