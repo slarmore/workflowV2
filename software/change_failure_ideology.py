@@ -10,7 +10,7 @@ from ..message import warning,log,display
 import os
 
 
-def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partition=default_partition,oldchk=None,**kwargs):
+def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partition=default_partition,oldchk=None,TS=False,**kwargs):
     '''This function takes in a mol object and creates a calculator 
     object that can preform the requested calculation given 
     the setup here
@@ -26,8 +26,7 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partitio
         else:
             raise TypeError('Expected Mol or Conformer object')
 
-    #always return a modified copy of the mol, rather than the modifying the mol itself
-    mol = mol.copy()
+
     #supported Gaussian runtypes
     supported_runtypes = {
         'opt':['opt','IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom'],
@@ -176,143 +175,27 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partitio
     #execution command
     command = 'export GAUSS_SCRDIR=./\nexport g16root={1}\n. $g16root/g16/bsd/g16.profile\n$g16root/g16/g16 INPUTFILE > OUTPUTFILE'.format(dir,g16root)
 
+    #combine all of the non-slurm arguments for the calculator interface
+    #this is how the resub will be able to update with all of the current keywords
+    argument_dict = kwargs
+    argument_dict['runtype'] = runtype
+    argument_dict['method'] = method
+    argument_dict['oldchk'] = oldchk
+    argument_dict['TS'] = TS
+
     #return the calculator object to either run with calculator.Run or calculator.RunBatch
-    return(calculator.Calculator(input=input,
+    return(calculator.Calculator(jobname=jobname,
+                input=input,
                 command=command,
                 nproc=nproc,
                 mem=mem,
                 time=time,
                 partition=partition,
                 program=gaussian(),
-                runtype=runtype,
-                jobname=jobname,
-                mol=mol))
-
-
-def GAUSSIAN_fixerrors(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partition=default_partition,oldchk=None,maxtries=3,TS=False,**kwargs):
-    mol.warnings = ['first_submission']
-    tries = 0
-    while len(mol.warnings) > 0:
-        tries += 1
-
-        #make fixes based on the warnings in mol.warnings
-        if tries > 1:
-            kwargs = fix_errors(mol,kwargs,TS)
-
-        log('{0} submission {1}'.format(jobname,tries))
-        calculator_obj = GAUSSIAN(mol,jobname='{0}-{1}'.format(jobname,tries),runtype=runtype,method=method,nproc=nproc,mem=mem,time=time,partition=partition,oldchk=oldchk,**kwargs)
-        oldchk = '{0}-{1}/{0}-{1}.chk'.format(jobname,tries)
-
-        if tries > maxtries:
-            raise Error('Ran out of fixerror tries')
-
-        mol = calculator.Run(calculator_obj)
-
-def GAUSSIAN_fixerrors_batch(mols,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partition=default_partition,oldchk=None,maxtries=3,TS=False,**kwargs):
-    if oldchk is None:
-        oldchk = [None for mol in mols]
-    
-    else:
-        if len(oldchk) != len(mols):
-            raise IndexError('The same number of molecules and oldchk files must be given. Use None for mols that do not need oldchks')
-    
-    for mol in mols:
-        mol.warnings = ['first_submission']
-
-    tries = 0 
-
-    need_submissions = [mol for mol in mols]
-
-    while len(need_submissions) > 0:
-        tries += 1
-
-        #make fixes based on the warnings in mol.warnings
-        if tries > 1:
-            kwargs = [fix_errors(mol,kwargs[index],TS) if mol in need_submissions else kwargs[index] for index,mol in enumerate(mols)]
-        else:
-            kwargs = [kwargs.copy() for mol in mols]
-
-        log('{0} submission {1}'.format(jobname,tries))
-        calculators = [GAUSSIAN(mol,jobname='{0}-{1}-try{2}'.format(jobname,index,tries),runtype=runtype,method=method,nproc=nproc,mem=mem,time=time,partition=partition,oldchk=oldchk[index],**kwargs[index]) for index,mol in enumerate(mols)]
-        oldchk = ['{0}-{1}-try{2}/{0}-{1}-try{2}.chk'.format(jobname,index,tries) for index,mol in enumerate(mols)]
-
-        if tries > maxtries:
-            raise Error('Ran out of fixerror tries')
-        
-        need_submissions = []
-        for mol in mols:
-            if len(mol.warnings) > 0:
-                need_submissions.append(mol)
-
-        mol = calculator.RunBatch(calculators)
-
-
-
-def fix_errors(mol,kwargs,TS):
-
-    #not very elegant, but loop through the list and 
-    #add keywords to fix any known errors
-    
-    if 'Non-Optimized' in mol.warnings:
-        log('Fixed Non-Optimized Error')
-        if 'freq' in kwargs:
-            if 'opt' in kwargs:
-                current = kwargs['opt']
-                #need a way to remove 'calcfc' but not remove 'recalcfc'
-                if not re.search('readfc',current):
-                    kwargs['opt'] = current + ',readfc'
-            else:
-                kwargs['opt'] = 'readfc'
-
-            kwargs['geom'] = 'check'
-            kwargs['guess'] = 'read'
-
-        else:
-            if 'opt' in kwargs:
-                current = kwargs['opt']
-                if not re.search('calcfc',current):
-                    kwargs['opt'] = current + ',calcfc'
-            else:
-                kwargs['opt'] = 'calcfc'
-    
-    if 'SCF_Error' in mol.warnings:
-        log('Fixed SCF_Error')
-        if 'scf' in kwargs:
-            current = kwargs['scf']
-            if not re.search('qc'):
-                kwargs['scf'] == current + ',qc'
-        else:
-            kwargs['scf'] = 'qc'
-    
-    if 'negative_frequency' in mol.warnings:
-        if TS:
-        #check for saddle point
-            if 'frequencies' in mol.properties:
-                if mol.properties['frequencies'][1] < 0:
-                    log('Fixed saddle point')
-                    if 'opt' in kwargs:
-                        current = kwargs['opt']
-                        if not re.search('readfc',current):
-                            kwargs['opt'] = current + ',readfc'
-                
-                    kwargs['geom'] = 'check'
-                    kwargs['guess'] = 'read'
-    
-        else:
-        #check for TS
-            log('Fixed negative frequency')
-            if 'opt' in kwargs:
-                current = kwargs['opt']
-                if not re.search('readfc',current):
-                    kwargs['opt'] = current + ',readfc'
-            else:
-                kwargs['opt'] = 'readfc'
-
-            kwargs['geom'] = 'check'
-            kwargs['guess'] = 'read'
-
-    return(kwargs)
-
+                mol=mol,
+                tries=2,
+                argument_dict=argument_dict,
+                try_count=0))
 
 
 class gaussian:
@@ -365,9 +248,7 @@ class gaussian:
                     self.keywords[key](calculator.mol,line_number,line,output_lines,calculator)
         
 
-        if re.search('Normal termination of Gaussian',output_lines[-1]):
-            return(calculator.mol)
-        else:
+        if not re.search('Normal termination of Gaussian',output_lines[-1]):
             with open(slurmoutput,'r') as slurm:
                 slurmoutput_content = slurm.read()
 
@@ -378,8 +259,84 @@ class gaussian:
             calculator.mol.warnings.append('Gaussian_Abnormal_Termination')
 
             output.close()
-            return(calculator.mol)
 
+        if calculator.resubmit:
+            if len(calculator.mol.wargnings) > 0:
+                return(calculator.mol,True)
+            else:
+                return(calculator.mol,False)
+        else:
+            return(calculator.mol,False)
+
+
+    def fix_errors(mol,kwargs,TS):
+
+        #not very elegant, but loop through the list and 
+        #add keywords to fix any known errors
+        
+        if 'Non-Optimized' in mol.warnings:
+            log('Fixed Non-Optimized Error')
+            if 'freq' in kwargs:
+                if 'opt' in kwargs:
+                    current = kwargs['opt']
+                    #need a way to remove 'calcfc' but not remove 'recalcfc'
+                    if not re.search('readfc',current):
+                        kwargs['opt'] = current + ',readfc'
+                else:
+                    kwargs['opt'] = 'readfc'
+
+                kwargs['geom'] = 'check'
+                kwargs['guess'] = 'read'
+
+            else:
+                if 'opt' in kwargs:
+                    current = kwargs['opt']
+                    if not re.search('calcfc',current):
+                        kwargs['opt'] = current + ',calcfc'
+                else:
+                    kwargs['opt'] = 'calcfc'
+        
+        if 'SCF_Error' in mol.warnings:
+            log('Fixed SCF_Error')
+            if 'scf' in kwargs:
+                current = kwargs['scf']
+                if not re.search('qc'):
+                    kwargs['scf'] == current + ',qc'
+            else:
+                kwargs['scf'] = 'qc'
+        
+        if 'negative_frequency' in mol.warnings:
+            if TS:
+            #check for saddle point
+                if 'frequencies' in mol.properties:
+                    if mol.properties['frequencies'][1] < 0:
+                        log('Fixed saddle point')
+                        if 'opt' in kwargs:
+                            current = kwargs['opt']
+                            if not re.search('readfc',current):
+                                kwargs['opt'] = current + ',readfc'
+                    
+                        kwargs['geom'] = 'check'
+                        kwargs['guess'] = 'read'
+        
+            else:
+            #check for TS
+                log('Fixed negative frequency')
+                if 'opt' in kwargs:
+                    current = kwargs['opt']
+                    if not re.search('readfc',current):
+                        kwargs['opt'] = current + ',readfc'
+                else:
+                    kwargs['opt'] = 'readfc'
+
+                kwargs['geom'] = 'check'
+                kwargs['guess'] = 'read'
+
+        return(kwargs)
+
+###########################################################
+#functions for parsing the output
+###########################################################
 
 def electronic_energies(mol,line_number,line,output_lines,calculator):
     energy = float(line.split()[4])
@@ -547,37 +504,5 @@ def frequencies(mol,line_number,line,output_lines,calculator):
         '''.format(calculator.jobname))
 
         mol.warnings.append('negative_frequency')
-
-
-def opt(outputfile):
-    '''Properties to find
-            1. electornic energy
-            2. thermal energies
-            3. coordinates
-            4. homo
-            5. lumo
-            6. homo -1
-            7. lumo +1
-            8. frequencies
-            9. list of optimization energies
-            10. frequency vectors
-            11. optimization geometries
-                        1. electronic energy
-            2. coordinates
-            3. homo
-            4. lumo
-            5. homo -1
-            6. lumo +1
-            7. list of irc energies
-            8. irc geometries
-            Properties to find
-        1. electornic energy
-        2. homo
-        3. lumo
-        4. homo-1
-        5. lumo +1'''
-    pass
-            
-
 
 
