@@ -33,7 +33,11 @@ class Calculator:
         self.partition = partition
         self.program = program
         self.jobname = jobname
-        
+
+        #resubmission
+        self.try_count = try_count
+        self.argument_dict = argument_dict
+
         #file io
         self.dir = os.path.abspath(jobname) + '/'
         self.inputfile_full = self.dir +  self.jobname + 'try{0}'.format(try_count) + '.' + self.program.infiles[0]
@@ -60,10 +64,6 @@ class Calculator:
 
         #always return a modified copy of the mol, rather than the modifying the mol itself
         self.mol = mol.copy()
-
-        #resubmission
-        self.try_count = try_count
-        self.argument_dict = argument_dict
 
         #can be called by the Run or RunBatch functions to update the calculator
         #object based on the failures read from the current submission
