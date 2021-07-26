@@ -40,6 +40,7 @@ class Calculator:
 
         #file io
         self.dir = os.path.abspath(jobname) + '/'
+        self.basename_full = self.dir +  self.jobname + '-try{0}'.format(try_count) 
         self.inputfile_full = self.dir +  self.jobname + '-try{0}'.format(try_count) + '.' + self.program.infiles[0]
         self.outputfile_full = self.dir +  self.jobname + '-try{0}'.format(try_count) + '.' + self.program.outfiles[0]
         self.inputfile_relative = self.jobname + '-try{0}'.format(try_count) + '.' + self.program.infiles[0]
@@ -68,8 +69,8 @@ class Calculator:
     #can be called by the Run or RunBatch functions to update the calculator
     #object based on the failures read from the current submission
     def resubmit(self):
-        updated_argument_dict = self.program.fix_errors(self.mol,self.argument_dict)
-        updated_calculator = self.program.resubmit(self.mol,self.jobname,updated_argument_dict,try_count=self.try_count+1)
+        updated_argument_dict = self.program.fix_errors(self.mol,self.basename_full,self.argument_dict)
+        updated_calculator = self.program.resubmit(updated_argument_dict,try_count=self.try_count+1)
         return(updated_calculator)
 
     #miscilaneous helper functions

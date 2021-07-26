@@ -182,6 +182,12 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partitio
     argument_dict['method'] = method
     argument_dict['oldchk'] = oldchk
     argument_dict['TS'] = TS
+    argument_dict['time'] = time
+    argument_dict['partition'] = partition
+    argument_dict['nproc'] = nproc
+    argument_dict['mem'] = mem
+    argument_dict['jobname'] = jobname
+    argument_dict['mol'] = mol
 
     #return the calculator object to either run with calculator.Run or calculator.RunBatch
     return(calculator_change_failure_ideology.Calculator(jobname=jobname,
@@ -220,10 +226,8 @@ class gaussian:
         self.keys = [key for key in self.keywords]
         self.keys_regrexs = [re.compile(key) for key in self.keys]
 
-    def resubmit(self,mol,jobname,kwargs,try_count):
-        display('arguments passed')
-        display(kwargs)
-        return(GAUSSIAN(mol,jobname,**kwargs,try_count=try_count))
+    def resubmit(self,kwargs,try_count):
+        return(GAUSSIAN(**kwargs,try_count=try_count))
 
     def read_output(self,calculator,slurmoutput):
         global step 
@@ -266,7 +270,7 @@ class gaussian:
         return(calculator.mol)
 
 
-    def fix_errors(self,mol,kwargs):
+    def fix_errors(self,mol,input_name,kwargs):
 
         #not very elegant, but loop through the list and 
         #add keywords to fix any known errors
@@ -284,6 +288,7 @@ class gaussian:
 
                 kwargs['geom'] = 'check'
                 kwargs['guess'] = 'read'
+                kwargs['oldchk'] = ['{0}.chk'.format(input_name)]
 
             else:
                 if 'opt' in kwargs:
@@ -316,6 +321,7 @@ class gaussian:
                     
                         kwargs['geom'] = 'check'
                         kwargs['guess'] = 'read'
+                        kwargs['oldchk'] = ['{0}.chk'.format(input_name)]
         
             else:
             #check for TS
@@ -329,6 +335,7 @@ class gaussian:
 
                 kwargs['geom'] = 'check'
                 kwargs['guess'] = 'read'
+                kwargs['oldchk'] = ['{0}.chk'.format(input_name)]
 
         return(kwargs)
 
