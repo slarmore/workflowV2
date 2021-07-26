@@ -260,7 +260,7 @@ class gaussian:
 
             output.close()
 
-        return(calculator.mol,False)
+        return(calculator.mol)
 
 
     def fix_errors(mol,kwargs,TS):
