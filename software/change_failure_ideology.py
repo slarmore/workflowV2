@@ -221,8 +221,8 @@ class gaussian:
         self.keys = [key for key in self.keywords]
         self.keys_regrexs = [re.compile(key) for key in self.keys]
 
-    def resubmit(self,kwargs,try_count):
-        return(GAUSSIAN(**kwargs,try_count=try_count))
+    def resubmit(self,mol,jobname,kwargs,try_count):
+        return(GAUSSIAN(mol,jobname,**kwargs,try_count=try_count))
 
     def read_output(self,calculator,slurmoutput):
         global step 
