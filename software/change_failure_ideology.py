@@ -128,7 +128,6 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partitio
         com.append('--Link1--')
 
         #add geom=check guess=read if not already present in the original route
-        print('this is the route',route)
         if not re.search('geom=\(check\)',route):
             route += ' geom=(check)'
         if not re.search('guess=\(read\)',route):
@@ -195,7 +194,7 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partitio
                 program=gaussian(),
                 mol=mol,
                 argument_dict=argument_dict,
-                try_count=0))
+                try_count=try_count))
 
 
 class gaussian:
