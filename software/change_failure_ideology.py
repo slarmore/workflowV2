@@ -263,7 +263,7 @@ class gaussian:
         return(calculator.mol)
 
 
-    def fix_errors(mol,kwargs,TS):
+    def fix_errors(mol,kwargs):
 
         #not very elegant, but loop through the list and 
         #add keywords to fix any known errors
@@ -300,6 +300,7 @@ class gaussian:
                 kwargs['scf'] = 'qc'
         
         if 'negative_frequency' in mol.warnings:
+            TS = kwargs['TS']
             if TS:
             #check for saddle point
                 if 'frequencies' in mol.properties:
