@@ -69,7 +69,7 @@ class Calculator:
     #object based on the failures read from the current submission
     def resubmit(self):
         updated_argument_dict = self.program.fix_errors(self.mol,self.argument_dict)
-        updated_calculator = self.program(updated_argument_dict,try_count=self.try_count+1)
+        updated_calculator = self.program.resubmit(updated_argument_dict,try_count=self.try_count+1)
         return(updated_calculator)
 
     #miscilaneous helper functions
