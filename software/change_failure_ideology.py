@@ -193,7 +193,6 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partitio
                 partition=partition,
                 program=gaussian(),
                 mol=mol,
-                tries=2,
                 argument_dict=argument_dict,
                 try_count=0))
 

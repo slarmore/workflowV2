@@ -24,7 +24,6 @@ class Calculator:
                 partition,
                 program,
                 mol,
-                tries,
                 argument_dict,
                 try_count):
         
@@ -64,7 +63,6 @@ class Calculator:
         self.mol = mol.copy()
 
         #resubmission
-        self.tries = tries
         self.try_count = try_count
         self.argument_dict = argument_dict
 
@@ -83,7 +81,7 @@ class Calculator:
 
 
 
-def Run(calculator):
+def Run(calculator,tries=1):
     '''just submit a single job'''
     #check that the input is a calculator object
     if not isinstance(calculator,Calculator):
@@ -99,7 +97,7 @@ def Run(calculator):
         if not calculator.mol.warnings[0] == 'First_submission':
             calculator = calculator.resubmit()
 
-        if calculator.try_count <= calculator.tries:
+        if calculator.try_count <= tries:
             sbatch_name = '{0}-try{1}.sbatch'.format(calculator.jobname,calculator.try_count)
             with open('{0}{1}'.format(calculator.dir,sbatch_name),'w') as sbatch: #directory is already ended with /
                 sbatch.write(generic_single(calculator))
