@@ -68,7 +68,7 @@ class Calculator:
     #can be called by the Run or RunBatch functions to update the calculator
     #object based on the failures read from the current submission
     def resubmit(self):
-        updated_argument_dict = self.program.fix_errors(self.mol,argument_dict)
+        updated_argument_dict = self.program.fix_errors(self.mol,self.argument_dict)
         updated_calculator = self.program(updated_argument_dict,try_count=self.try_count+1)
         return(updated_calculator)
 
