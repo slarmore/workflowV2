@@ -1,5 +1,5 @@
 import os
-from setuptools import setup
+from setuptools import setup,find_packages
 
 # Utility function to read the README file.
 # Used for the long_description.  It's nice, because now 1) we have a top level
@@ -15,6 +15,6 @@ setup(
     author_email = "prnmac12@gmail.com",
     description = ("An automation tool for QM calculations"),
     url = "https://github.com/neal-p/workflowV2",
-    packages=['workflowV2'],
+    packages=find_packages()
     long_description=read('README'),
 )
