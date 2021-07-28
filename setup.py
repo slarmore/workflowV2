@@ -1,10 +1,20 @@
-from distutils.core import setup
+import os
+from setuptools import setup
 
-setup(name='workflowV2',
-      version='2.0',
-      description='QM workflow python package',
-      author='Patrick Neal',
-      author_email='prnmac12@gmail.com',
-      url='https://github.com/neal-p/workflowV2/',
-      packages=['workflowV2'],
-     )
+# Utility function to read the README file.
+# Used for the long_description.  It's nice, because now 1) we have a top level
+# README file and 2) it's easier to type in the README file than to put a raw
+# string in below ...
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
+setup(
+    name = "workflowV2",
+    version = "2.0",
+    author = "Patrick Neal",
+    author_email = "prnmac12@gmail.com",
+    description = ("An automation tool for QM calculations"),
+    url = "https://github.com/neal-p/workflowV2",
+    packages=['workflowV2'],
+    long_description=read('README'),
+)
