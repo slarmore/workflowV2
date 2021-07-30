@@ -33,12 +33,12 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partitio
 
     #supported Gaussian runtypes
     supported_runtypes = {
-        'opt':['opt','IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom'],
-        'opt_freq':['opt','freq','IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom'],
-        'freq':['freq','IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom'],
-        'sp':['IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom'],
-        'irc':['irc','IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom'],
-        'tddft':['td','IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom']
+        'opt':['opt','IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom','td'],
+        'opt_freq':['opt','freq','IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom','td'],
+        'freq':['freq','IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom','td'],
+        'sp':['IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom','td'],
+        'irc':['irc','IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom','td'],
+        'tddft':['td','IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom','td']
     }
 
     if not runtype in supported_runtypes:
@@ -222,7 +222,8 @@ class gaussian:
                              'Standard orientation': geometry,
                              'Non-Optimized Parameters': non_opt,
                              'armonic frequencies': frequencies,       #want to match both Harmonic and Anharmonic
-                             'SCF Error SCF Error SCF Error SCF Error': scf_error
+                             'SCF Error SCF Error SCF Error SCF Error': scf_error,
+                             'Total Energy, E': tddft_energy
 
         }
 
@@ -512,5 +513,9 @@ def frequencies(mol,line_number,line,output_lines,calculator):
         '''.format(calculator.jobname))
 
         mol.warnings.append('negative_frequency')
+
+def tddft_energy(mol,line_number,line,output_lines,calculator):
+    mol.energy = float(line.split()[-1])
+    mol.properties['tddft_energy'] = float(line.split()[-1])
 
 
