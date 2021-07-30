@@ -332,7 +332,7 @@ class gaussian:
                              'Non-Optimized Parameters': non_opt,
                              'armonic frequencies': frequencies,       #want to match both Harmonic and Anharmonic
                              'SCF Error SCF Error SCF Error SCF Error': scf_error,
-                             'Total Energy, E(TD-HF/TD-DFT)': tddft_energy
+                             'Total Energy, E': tddft_energy
 
         }
 
