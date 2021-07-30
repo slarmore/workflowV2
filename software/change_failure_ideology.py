@@ -294,18 +294,13 @@ class gaussian:
                     current = kwargs['opt']
                     if not re.search('calcfc',current):
                         kwargs['opt'] = current + ',calcfc'
+                else:
+                    kwargs['opt'] = 'calcfc'
 
             kwargs['geom'] = 'check'
             kwargs['guess'] = 'read'
             kwargs['oldchk'] = '{0}.chk'.format(input_name)
 
-            else:
-                if 'opt' in kwargs:
-                    current = kwargs['opt']
-                    if not re.search('calcfc',current):
-                        kwargs['opt'] = current + ',calcfc'
-                else:
-                    kwargs['opt'] = 'calcfc'
         
         if 'SCF_Error' in mol.warnings:
             log('Fixed SCF_Error')
