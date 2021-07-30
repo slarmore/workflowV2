@@ -233,7 +233,7 @@ def confsearch(output_lines,dir,mol):
             atoms = np.array(atoms)
             coords = np.array(coords)
 
-            conformers.append(molecule.Conformer(energies[conf_id],atoms,coords,xyz=xyz,tags={'origin':'CREST'},constraints=mol.constraints))
+            conformers.append(molecule.Conformer(energies[conf_id],atoms,coords,xyz=xyz,tags={'origin':'CREST'},constraints=mol.constraints,charge=mol.charge,mult=mol.mult))
     
     #return the original mol object with the updated conformers
     mol.conformers = conformers
