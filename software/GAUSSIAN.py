@@ -331,7 +331,8 @@ class gaussian:
                              'Standard orientation': geometry,
                              'Non-Optimized Parameters': non_opt,
                              'armonic frequencies': frequencies,       #want to match both Harmonic and Anharmonic
-                             'SCF Error SCF Error SCF Error SCF Error': scf_error
+                             'SCF Error SCF Error SCF Error SCF Error': scf_error,
+                             'Total Energy, E(TD-HF/TD-DFT)': tddft_energy
 
         }
 
@@ -547,6 +548,9 @@ def frequencies(mol,line_number,line,output_lines,calculator):
         '''.format(calculator.jobname))
 
         mol.warnings.append('negative_frequency')
+
+def tddft_energy(mol,line_number,line,output_lines,calculator):
+    mol.energy = line.split()[-1]
 
 
 def opt(outputfile):
