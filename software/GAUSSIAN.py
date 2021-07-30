@@ -550,7 +550,8 @@ def frequencies(mol,line_number,line,output_lines,calculator):
         mol.warnings.append('negative_frequency')
 
 def tddft_energy(mol,line_number,line,output_lines,calculator):
-    mol.energy = line.split()[-1]
+    mol.energy = float(line.split()[-1])
+    mol.properties['tddft_energy'] = float(line.split()[-1])
 
 
 def opt(outputfile):
