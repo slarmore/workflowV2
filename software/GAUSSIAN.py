@@ -30,12 +30,12 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time='1-00:00:00',partitio
     mol = mol.copy()
     #supported Gaussian runtypes
     supported_runtypes = {
-        'opt':['opt','IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom'],
-        'opt_freq':['opt','freq','IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom'],
-        'freq':['freq','IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom'],
-        'sp':['IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom'],
-        'irc':['irc','IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom'],
-        'tddft':['td','IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom']
+        'opt':['opt','IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom','td'],
+        'opt_freq':['opt','freq','IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom','td'],
+        'freq':['freq','IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom','td'],
+        'sp':['IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom','td'],
+        'irc':['irc','IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom','td'],
+        'tddft':['td','IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom','opt']
     }
 
     if not runtype in supported_runtypes:
