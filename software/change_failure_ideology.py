@@ -281,7 +281,8 @@ class gaussian:
         
         if 'Non-Optimized' in mol.warnings:
             log('Fixed Non-Optimized Error')
-            if 'freq' in kwargs:
+            #check if frequencies were sucessfully computed
+            if 'frequecies' in mol.properties:
                 if 'opt' in kwargs:
                     current = kwargs['opt']
                     #need a way to remove 'calcfc' but not remove 'recalcfc'
