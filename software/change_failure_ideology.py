@@ -289,10 +289,15 @@ class gaussian:
                         kwargs['opt'] = current + ',readfc'
                 else:
                     kwargs['opt'] = 'readfc'
+            else:
+                if 'opt' in kwargs:
+                    current = kwargs['opt']
+                    if not re.search('calcfc',current):
+                        kwargs['opt'] = current + ',calcfc'
 
-                kwargs['geom'] = 'check'
-                kwargs['guess'] = 'read'
-                kwargs['oldchk'] = '{0}.chk'.format(input_name)
+            kwargs['geom'] = 'check'
+            kwargs['guess'] = 'read'
+            kwargs['oldchk'] = '{0}.chk'.format(input_name)
 
             else:
                 if 'opt' in kwargs:
