@@ -372,7 +372,18 @@ def orbital_energies(mol,line_number,line,output_lines,calculator):
         occupied_orbitals = []
         homo_line_number = line_number
         homo_line = output_lines[homo_line_number].split()[4:]
-        occupied_orbitals.extend(list(reversed([float(energy) for energy in homo_line])))
+        clean_list = []
+        for orbital in homo_line:
+            #if there wasn't a space between the
+            if re.search('.*-.*-.*',orbital):
+                splitapart = orbital.split('-')
+                #add back the negative sign
+                splitapart = ['-'+energy for enregy in splitapart]
+                clean_list.extend(splitapart)
+            else:
+                clean_list.append(orbital)
+                
+        occupied_orbitals.extend(list(reversed([float(energy) for energy in clean_list])))
 
         #need to walk backward through the file and grab all of the occupied orbital energies 
         # until the line does not contain 'Alpha occ. eigenvalues'
