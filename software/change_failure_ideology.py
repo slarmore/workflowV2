@@ -285,15 +285,19 @@ class gaussian:
             if 'frequecies' in mol.properties:
                 if 'opt' in kwargs:
                     current = kwargs['opt']
+                    if re.search('calcall',current):
+                        pass
                     #need a way to remove 'calcfc' but not remove 'recalcfc'
-                    if not re.search('readfc',current):
+                    elif not re.search('readfc',current):
                         kwargs['opt'] = current + ',readfc'
                 else:
                     kwargs['opt'] = 'readfc'
             else:
                 if 'opt' in kwargs:
                     current = kwargs['opt']
-                    if not re.search('calcfc',current):
+                    if re.search('calcall',current):
+                        pass
+                    elif not re.search('calcfc',current):
                         kwargs['opt'] = current + ',calcfc'
                 else:
                     kwargs['opt'] = 'calcfc'
