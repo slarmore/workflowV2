@@ -390,7 +390,7 @@ def orbital_energies(mol,line_number,line,output_lines,calculator):
         # until the line does not contain 'Alpha occ. eigenvalues'
         homo_line_number -= 1
         newline = output_lines[homo_line_number]
-        while re.search('Alpha  occ. eigenvalues',newline):
+        while orbital.count('-') > 1:
             newline = newline.split()[4:]
             clean_list = []
             for orbital in newline:
