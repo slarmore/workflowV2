@@ -375,7 +375,8 @@ def orbital_energies(mol,line_number,line,output_lines,calculator):
         clean_list = []
         for orbital in homo_line:
             #if there wasn't a space between the
-            if re.search('.*-.*-.*',orbital):
+            if orbital.count('-') > 1:
+                print('split apart energy {0}'.format(orbital))
                 splitapart = orbital.split('-')
                 #add back the negative sign
                 splitapart = ['-'+energy for enregy in splitapart]
@@ -393,7 +394,8 @@ def orbital_energies(mol,line_number,line,output_lines,calculator):
             newline = newline.split()[4:]
             clean_list = []
             for orbital in newline:
-                if re.search('.*-.*-',orbital):
+                if orbital.count('-') > 1:
+                    print('split apart energy {0}'.format(orbital))
                     splitapart = orbital.split('-')
                     #add back the negative sign
                     splitapart = ['-' + energy for energy in splitapart]
