@@ -391,7 +391,16 @@ def orbital_energies(mol,line_number,line,output_lines,calculator):
         newline = output_lines[homo_line_number]
         while re.search('Alpha  occ. eigenvalues',newline):
             newline = newline.split()[4:]
-            occupied_orbitals.extend(list(reversed([float(energy) for energy in newline])))
+            clean_list = []
+            for orbital in newline:
+                if re.search('.*-.*-',orbital):
+                    splitapart = orbital.split('-')
+                    #add back the negative sign
+                    splitapart = ['-' + energy for energy in splitapart]
+                    clean_list.extend(splitapart)
+                else:
+                    clean_list.append(orbital)
+            occupied_orbitals.extend(list(reversed([float(energy) for energy in clean_list])))
             homo_line_number -= 1
             newline = output_lines[homo_line_number]
 
