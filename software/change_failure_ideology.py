@@ -390,11 +390,13 @@ def orbital_energies(mol,line_number,line,output_lines,calculator):
         # until the line does not contain 'Alpha occ. eigenvalues'
         homo_line_number -= 1
         newline = output_lines[homo_line_number]
-        while orbital.count('-') > 1:
+        while re.search('Alpha  occ. eigenvalues',newline):
             newline = newline.split()[4:]
             clean_list = []
             for orbital in newline:
-                if re.search('.*-.*-.*',orbital):
+                display(orbital)
+                if orbital.count('-') > 1:
+                    display('was split')
                     splitapart = orbital.split('-')
                     #add back the negative sign
                     splitapart = ['-' + energy for energy in splitapart]
