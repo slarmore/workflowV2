@@ -393,7 +393,7 @@ def orbital_energies(mol,line_number,line,output_lines,calculator):
             newline = newline.split()[4:]
             clean_list = []
             for orbital in newline:
-                if re.search('.*-.*-',orbital):
+                if re.search('.*-.*-.*',orbital):
                     splitapart = orbital.split('-')
                     #add back the negative sign
                     splitapart = ['-' + energy for energy in splitapart]
