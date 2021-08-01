@@ -409,7 +409,7 @@ def orbital_energies(mol,line_number,line,output_lines,calculator):
                 print('split apart energy {0}'.format(orbital))
                 splitapart = orbital.split('-')
                 #add back the negative sign
-                splitapart = ['-'+energy for enregy in splitapart]
+                splitapart = ['-{0}'.format(energy) for energy in splitapart]
                 clean_list.extend(splitapart)
             else:
                 clean_list.append(orbital)
@@ -429,7 +429,7 @@ def orbital_energies(mol,line_number,line,output_lines,calculator):
                     display('was split')
                     splitapart = orbital.split('-')
                     #add back the negative sign
-                    splitapart = ['-' + energy for energy in splitapart]
+                    splitapart = ['-{0}'.format(energy) for energy in splitapart]
                     clean_list.extend(splitapart)
                 else:
                     clean_list.append(orbital)
