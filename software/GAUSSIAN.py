@@ -407,9 +407,10 @@ def orbital_energies(mol,line_number,line,output_lines,calculator):
             #if there wasn't a space between the
             if orbital.count('-') > 1:
                 print('split apart energy {0}'.format(orbital))
-                splitapart = orbital.split('-')
+                splitapart = orbital.split('-')[1:]
                 #add back the negative sign
                 splitapart = ['-{0}'.format(energy) for energy in splitapart]
+                display(splitapart)
                 clean_list.extend(splitapart)
             else:
                 clean_list.append(orbital)
@@ -427,9 +428,10 @@ def orbital_energies(mol,line_number,line,output_lines,calculator):
                 display(orbital)
                 if orbital.count('-') > 1:
                     display('was split')
-                    splitapart = orbital.split('-')
+                    splitapart = orbital.split('-')[1:]
                     #add back the negative sign
                     splitapart = ['-{0}'.format(energy) for energy in splitapart]
+                    display(splitapart)
                     clean_list.extend(splitapart)
                 else:
                     clean_list.append(orbital)
