@@ -263,6 +263,10 @@ class gaussian:
         matches = [calculator.dir + match for match in self.unessesary_files]
         cleaner(matches)
 
+        #define steps for gathering optimization steps
+        global step 
+        step = -1
+
         #for each line, check if any keywords are found
         #if so, use the matching function to update the mol object
         for line_number,line in enumerate(output_lines):
