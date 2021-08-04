@@ -52,9 +52,7 @@ class Mol:
 
     ####################
     #derived attributes#
-        self.get_xyz()
         self.get_rdkitmol()
-        self.get_xyzstring()
 
     def get_xyz(self):
         if len(self.atoms) != len(self.coords):
@@ -94,6 +92,7 @@ class Mol:
 
     @atoms.setter
     def atoms(self,new_atoms):
+        self.atoms = new_atoms
         self._natoms = len(new_atoms)
         self.update_geometry()
 
