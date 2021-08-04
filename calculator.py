@@ -185,7 +185,7 @@ def RunBatch(calculators,jobname='batch_job',max=50,tries=1):
             new_need_resub = []
             for index in need_resub:
                 slurmoutput = '{0}/{0}-{1}_{2}.out'.format(jobname,slurmID,index+1) 
-                calculators[index].mol = calculator[index].program.read_output(calculators[index],slurmoutput)
+                calculators[index].mol = calculators[index].program.read_output(calculators[index],slurmoutput)
                 output[index] = calculators[index].mol
 
                 #if the returned mol object has warnings, 
