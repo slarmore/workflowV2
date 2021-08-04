@@ -474,7 +474,7 @@ def SmilesToMol(smiles,
             
             coords.append([x,y,z])
             atoms.append(symbol)
-        conformers.append(Conformer(energy,np.array(atoms),np.array(coords),xyz=None,tags=tags,smiles=smiles,charge=charge,mult=mult))
+        conformers.append(Conformer(energy=energy,atoms=np.array(atoms),coords=np.array(coords),tags=tags,smiles=smiles,charge=charge,mult=mult))
 
     #sort the conformers by energy (first value in the tuple)
     conformers.sort(key=lambda x: x.energy)
@@ -485,7 +485,7 @@ def SmilesToMol(smiles,
     energy = conformers[0].energy
 
     #return the mol object
-    return(Mol(atoms,coords,smiles=smiles,energy=energy,conformers=conformers,
+    return(Mol(atoms=atoms,coords=coords,smiles=smiles,energy=energy,conformers=conformers,
                     constraints=constraints,tags=tags,
                     charge=charge,mult=mult))
 
