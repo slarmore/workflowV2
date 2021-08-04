@@ -30,6 +30,8 @@ class Mol:
                 properties={}, 
                 warnings=[]): 
 
+        log('this is a test')
+
     #######################
     #check for valid input#
         if len(atoms) != len(coords):
