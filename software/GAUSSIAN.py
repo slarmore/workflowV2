@@ -491,9 +491,9 @@ def geometry(mol,line_number,line,output_lines,calculator):
 
     #add the geometry to the list of geometries
     if 'optimization_xyzs' in mol.properties:
-        mol.properties['optimization_xyzs'].append(mol.ToXYZ(title='step{0}'.format(step),coords=coords,write=False))
+        mol.properties['optimization_xyzs'].append(mol.ToXYZ(title='step{0}'.format(step),write=False))
     else:
-        mol.properties['optimization_xyzs'] = [mol.ToXYZ(title='step{0}'.format(step),coords=coords,write=False)]
+        mol.properties['optimization_xyzs'] = [mol.ToXYZ(title='step{0}'.format(step),write=False)]
 
 def non_opt(mol,line_number,line,output_lines,calculator):
     warning('''Non-Optimized Parameters - Gaussian did not converge the geometry for {0}
