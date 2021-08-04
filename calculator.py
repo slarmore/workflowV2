@@ -171,7 +171,7 @@ def RunBatch(calculators,jobname='batch_job',max=50,tries=1):
             for index in need_resub:
                 command_file_name = '{0}/{0}-{1}-try{2}.sh'.format(jobname,index+1,calculators[index].try_count)   #slurm array index start at 1 not 0
                 with open(command_file_name,'w') as command_file:
-                    command_file.write(generic_command(calculator))
+                    command_file.write(generic_command(calculators[index]))
         
             #submit the job
             log('submitting - sbatch {0}'.format(jobname))
