@@ -60,7 +60,7 @@ def CREST(mol,jobname,runtype,nproc=1,mem=1,time=default_time,partition=default_
 
     #the input for CREST is just an xyz file, unless constraints are present, 
     # then need additional constraint file
-    xyz = '{0}\n{1}\n{2}'.format(mol.natoms,jobname,mol.xyz_string)
+    xyz = '{0}\n{1}\n{2}'.format(mol.natoms,jobname,mol.xyzstring)
     
     #create string with the input file
     #constraints if necessary

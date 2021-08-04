@@ -39,7 +39,6 @@ class Mol:
     #################
     #core attributes#
         self._coords = False
-        self.smiles = smiles
         self.atoms = atoms
         self.coords = coords
         self.conformers = conformers
@@ -51,6 +50,8 @@ class Mol:
         self.mult = mult
         self.properties = properties
         self._natoms = len(self.atoms)
+        self.smiles = smiles
+
 
     ####################
     #derived attributes#
@@ -83,6 +84,7 @@ class Mol:
         self.xyzstring = '\n'.join(xyzstring)
 
     def update_geometry(self):
+        print('ran update_geometry')
         self.get_xyz()
         self.get_xyzstring()
 
@@ -102,7 +104,7 @@ class Mol:
 
     @property
     def coord(self):
-        return(self.coord)
+        return(self._coord)
 
     @coord.setter
     def coord(self,new_coords):
@@ -110,7 +112,7 @@ class Mol:
             raise IndexError('Length of atoms is {0}, length of coords is {1}'.format(len(self.atoms),len(self.coords)))
 
         #make a numpy array of float points for consistency
-        self.coords = np.array(new_coords,dtype=np.float64)
+        self._coords = np.array(new_coords,dtype=np.float64)
         self.update_geometry()
 
     @property
