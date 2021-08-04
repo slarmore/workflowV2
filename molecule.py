@@ -265,15 +265,16 @@ class Conformer:
         if len(atoms) != len(coords):
             raise IndexError('Length of atoms is {0}, length of coords is {1}'.format(len(atoms),len(coords)))
 
-        self.energy = energy
+        self._coords = False
         self.atoms = atoms
         self.coords = coords
-        self.tags = tags
-        self._natoms = len(self.atoms)
+        self.energy = energy
         self.constraints = constraints
-        self.smiles = smiles
+        self.tags = tags
         self.charge = charge
         self.mult = mult
+        self._natoms = len(self.atoms)
+        self.smiles = smiles
 
     def get_xyz(self):
         if len(self.atoms) != len(self.coords):
