@@ -88,11 +88,11 @@ class Mol:
     #shouldn't touch, or ensure updates to the rest of the info
     @property
     def atoms(self):
-        return(self.atoms)
+        return(self._atoms)
 
     @atoms.setter
     def atoms(self,new_atoms):
-        self.atoms = new_atoms
+        self._atoms = new_atoms
         self._natoms = len(new_atoms)
         self.update_geometry()
 
