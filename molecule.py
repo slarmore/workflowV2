@@ -17,7 +17,7 @@ class FrozenClass(object):
     __isfrozen = False
     def __setattr__(self, key, value):
         if self.__isfrozen and key not in dir(self):
-            raise TypeError( "Cannot add attribute to {0}, use .tags dict to store information".format(self))
+            raise TypeError( "Cannot add attribute to {0}, use .tags dict to store misc. information".format(self))
         object.__setattr__(self, key, value)
 
     def _freeze(self):
