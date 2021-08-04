@@ -103,7 +103,7 @@ class Mol:
 
     @property
     def coords(self):
-        return(self._coord)
+        return(self._coords)
 
     @coords.setter
     def coords(self,new_coords):
