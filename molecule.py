@@ -104,6 +104,10 @@ class Mol:
     def coord(self,new_coords):
         if len(new_coords) != len(self.atoms):
             raise IndexError('Length of atoms is {0}, length of coords is {1}'.format(len(self.atoms),len(self.coords)))
+
+        #make a numpy array of float points for consistency
+        new_coords = np.array(new_coords,dtype=np.float)
+
         self.coords = new_coords
         self.update_geometry()
 
@@ -239,7 +243,7 @@ class Mol:
 
 
 #######################################################################################################
-#Mol object
+#Conformer object
 
 class Conformer:
     '''a container to store conformers - its a lighter weight version of the mol object'''
@@ -262,16 +266,11 @@ class Conformer:
         self.atoms = atoms
         self.coords = coords
         self.tags = tags
-        self.natoms = len(atoms)
+        self._natoms = len(self.atoms)
         self.constraints = constraints
         self.smiles = smiles
         self.charge = charge
         self.mult = mult
-
-    ####################
-    #derived attributes#
-        self.get_xyz()
-        self.get_xyzstring()
 
     def get_xyz(self):
         if len(self.atoms) != len(self.coords):
@@ -297,6 +296,16 @@ class Conformer:
     #restrict access to some Conformer properties that user
     #shouldn't touch, or ensure updates to the rest of the info
     @property
+    def atoms(self):
+        return(self._atoms)
+
+    @atoms.setter
+    def atoms(self,new_atoms):
+        self._atoms = new_atoms
+        self._natoms = len(new_atoms)
+        self.update_geometry()
+
+    @property
     def coord(self):
         return(self.coord)
 
@@ -304,12 +313,16 @@ class Conformer:
     def coord(self,new_coords):
         if len(new_coords) != len(self.atoms):
             raise IndexError('Length of atoms is {0}, length of coords is {1}'.format(len(self.atoms),len(self.coords)))
+
+        #make a numpy array of float points for consistency
+        new_coords = np.array(new_coords,dtype=np.float)
+        
         self.coords = new_coords
         self.update_geometry()
 
     @property
     def natoms(self):
-        return(self.natoms)
+        return(self._natoms)
 
 ###################
 #File IO functions#
