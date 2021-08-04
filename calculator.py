@@ -163,7 +163,7 @@ def RunBatch(calculators,jobname='batch_job',max=50,tries=1):
     while len(need_resub) > 0:
 
         #unless the number of tries is up (just need to check the first calculator in the list that needs computing)
-        if need_resub[0].try_count <= tries:
+        if calculators[need_resub[0]].try_count <= tries:
 
             with open(jobname + '/' + jobname+ '.sbatch','w') as sbatch:
                 sbatch.write(generic_batch(jobname,calculators,max,need_resub))

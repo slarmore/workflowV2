@@ -12,7 +12,7 @@ from .message import warning,log,display
 from .config import max_conformers
 
 #######################################################################################################
-#class for freezing the attributes of mol object
+#class for freezing the attributes of mol and conformer objects
 class FrozenClass(object):
     __isfrozen = False
     def __setattr__(self, key, value):
