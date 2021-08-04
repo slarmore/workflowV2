@@ -388,9 +388,8 @@ def XYZToMol(infile,
 
         #return the mol object
         return(Mol(atoms,coords,smiles=smiles,energy=energy,
-                    constraints=[],tags=tags,
-                    charge=charge,mult=mult,
-                    xyz=xyz))
+                    constraints=constraints,tags=tags,
+                    charge=charge,mult=mult))
     else:
         warning('No such file {0}'.format(infile))
         return(None)
@@ -399,7 +398,9 @@ def SmilesToMol(smiles,
             nconfs=5,
             tags={},
             charge=0,
-            mult=1):
+            mult=1,
+            constraints=[],
+            seed=0):
     '''Wrapper for taking in a smiles and using RDKIT to generate conformers and energies'''
    
     if nconfs > max_conformers:
@@ -407,7 +408,7 @@ def SmilesToMol(smiles,
 
     rdkitmol = Chem.MolFromSmiles(smiles)
     rdkitmol = AllChem.AddHs(rdkitmol,addCoords=True)
-    AllChem.EmbedMultipleConfs(rdkitmol,numConfs=nconfs,enforceChirality=True,numThreads=0)
+    AllChem.EmbedMultipleConfs(rdkitmol,numConfs=nconfs,enforceChirality=True,numThreads=0,randomSeed=seed)
     energies = AllChem.UFFOptimizeMoleculeConfs(rdkitmol,numThreads=0)
     energies = [energy[1] for energy in energies]
 
@@ -441,9 +442,8 @@ def SmilesToMol(smiles,
 
     #return the mol object
     return(Mol(atoms,coords,smiles=smiles,energy=energy,conformers=conformers,
-                    constraints=[],tags=tags,
-                    charge=charge,mult=mult,
-                    xyz=None))
+                    constraints=constraints,tags=tags,
+                    charge=charge,mult=mult))
 
 
 
