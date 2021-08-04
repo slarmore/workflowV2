@@ -166,7 +166,7 @@ def RunBatch(calculators,jobname='batch_job',max=50,tries=1):
         if calculators[need_resub[0]].try_count <= tries:
 
             with open(jobname + '/' + jobname+ '.sbatch','w') as sbatch:
-                sbatch.write(generic_batch(jobname,calculators,max,need_resub))
+                sbatch.write(generic_batch(jobname,calculators,max,need_resub,calculators[index].try_count))
 
             for index in need_resub:
                 command_file_name = '{0}/{0}-{1}-try{2}.sh'.format(jobname,index+1,calculators[index].try_count)   #slurm array index start at 1 not 0
@@ -223,7 +223,7 @@ def generic_single(calculator):
 """.format(calculator.jobname,calculator.partition,calculator.mem,calculator.nproc,calculator.time,calculator.command)
     return(generic_single_string)
 
-def generic_batch(jobname,calculators,max,need_resub):
+def generic_batch(jobname,calculators,max,need_resub,try_count):
     #need to get the slurm parameters - get it from the first calculator and just assume they are the same....
     partition = calculators[0].partition
     mem = calculators[0].mem
@@ -243,11 +243,11 @@ def generic_batch(jobname,calculators,max,need_resub):
 
 #keep each calculator command in a separate script that get's called
 #based on the array task id
-chmod 777 {0}-${{SLURM_ARRAY_TASK_ID}}.sh
+chmod 777 {0}-${{SLURM_ARRAY_TASK_ID}}-try{7}.sh
 
-./{0}-${{SLURM_ARRAY_TASK_ID}}.sh
+./{0}-${{SLURM_ARRAY_TASK_ID}}-try{7}.sh
 
-""".format(jobname,partition,mem,nproc,time,len(need_resub),max)
+""".format(jobname,partition,mem,nproc,time,len(need_resub),max,try_count)
     return(generic_batch_string)
 
 def generic_command(calculator):
