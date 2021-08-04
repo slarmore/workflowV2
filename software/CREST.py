@@ -289,7 +289,7 @@ def confs(mol,line_number,line,output_lines,calculator):
             atoms = np.array(atoms)
             coords = np.array(coords)
 
-            conformers.append(molecule.Conformer(energies[conf_id],atoms,coords,tags={'origin':'CREST'},constraints=mol.constraints,charge=mol.charge,mult=mol.mult))
+            conformers.append(molecule.Conformer(atoms=atoms,coords=coords,energy=energies[conf_id],tags={'origin':'CREST'},constraints=mol.constraints,charge=mol.charge,mult=mol.mult))
     
     #return the original mol object with the updated conformers
     mol.conformers = conformers
