@@ -12,7 +12,6 @@ def nologging(boolean):
     else:
         __logging__ = True
 
-
 def logtofile(file):
     global __logfile__
     global __logging__
@@ -23,8 +22,6 @@ def logtofile(file):
         __logfile__ = None
     else:
         __logfile__ = os.path.abspath(file)
-
-
 
 def warning(string):
     global __logging__
@@ -42,7 +39,6 @@ def warning(string):
         else:
             with open(__logfile__,'a') as log:
                 log.write(string)
-
 
 def log(string):
     global __logging__

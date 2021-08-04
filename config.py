@@ -1,7 +1,7 @@
 crest_exe = '/work/lopez/xtb/crest'
 xtb_exe = '/work/lopez/xtb/xtb_6.2.3/bin/xtb'
-#xtb_exe = 'fake_path'
 g16root = '/work/lopez/'
-default_partition = 'short'
+default_partition = 'short,lopez'
 crest_constraint_force_constrant = 1.0
 max_conformers = 500
+default_time = '1-00:00:00'
