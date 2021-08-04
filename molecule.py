@@ -30,7 +30,7 @@ class Mol:
                 properties={}, 
                 warnings=[]): 
 
-                
+
     #######################
     #check for valid input#
         if len(atoms) != len(coords):
@@ -112,6 +112,7 @@ class Mol:
         #make a numpy array of float points for consistency
         new_coords = np.array(new_coords,dtype=np.float64)
         log(type(new_coords[0][0]))
+        print(type(new_coords[0][0]))
 
         self.coords = new_coords
         self.update_geometry()
