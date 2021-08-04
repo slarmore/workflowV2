@@ -110,11 +110,7 @@ class Mol:
             raise IndexError('Length of atoms is {0}, length of coords is {1}'.format(len(self.atoms),len(self.coords)))
 
         #make a numpy array of float points for consistency
-        new_coords = np.array(new_coords,dtype=np.float64)
-        log(type(new_coords[0][0]))
-        print(type(new_coords[0][0]))
-
-        self.coords = new_coords
+        self.coords = np.array(new_coords,dtype=np.float64)
         self.update_geometry()
 
     @property
