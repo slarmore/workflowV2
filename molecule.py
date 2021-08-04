@@ -137,7 +137,7 @@ class Mol(FrozenClass):
 
 ###################
 #File IO functions#
-    def ToXYZ(self,outfile,title=None,write=True):
+    def ToXYZ(self,outfile=None,title=None,write=True):
         #number of atoms
         out = [str(self.natoms)]
 
@@ -153,6 +153,9 @@ class Mol(FrozenClass):
 
         #write to file if requrested, otherwise return string
         if write:
+            if outfile is None:
+                raise TypeError('outfile must not be None if write is True')
+                
             with open(outfile,'w') as xyzout:
                 xyzout.write('\n'.join(out))
         else:
