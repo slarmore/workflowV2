@@ -212,7 +212,7 @@ class Mol(FrozenClass):
         then re-rank the conformers with relative energies'''
 
         #take the generic calculator and apply it to each conformre
-        calculators = [calculator_class(conf,jobname=jobname+'{0}'.format(index),**kwargs) for index,conf in enumerate(self.conformers)]
+        calculators = [calculator_class(conf,jobname=jobname+'-{0}'.format(index),**kwargs) for index,conf in enumerate(self.conformers)]
         
         conformers = calculator.RunBatch(calculators,jobname,tries=tries)
         conformers.sort(key=lambda x: x.energy)
