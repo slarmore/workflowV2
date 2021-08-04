@@ -84,7 +84,6 @@ class Mol:
         self.xyzstring = '\n'.join(xyzstring)
 
     def update_geometry(self):
-        print('ran update_geometry')
         self.get_xyz()
         self.get_xyzstring()
 
@@ -103,11 +102,11 @@ class Mol:
             self._coords = True
 
     @property
-    def coord(self):
+    def coords(self):
         return(self._coord)
 
-    @coord.setter
-    def coord(self,new_coords):
+    @coords.setter
+    def coords(self,new_coords):
         if len(new_coords) != len(self.atoms):
             raise IndexError('Length of atoms is {0}, length of coords is {1}'.format(len(self.atoms),len(self.coords)))
 
