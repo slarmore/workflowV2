@@ -30,8 +30,7 @@ class Mol:
                 properties={}, 
                 warnings=[]): 
 
-        log('this is a test')
-
+                
     #######################
     #check for valid input#
         if len(atoms) != len(coords):
@@ -39,14 +38,15 @@ class Mol:
 
     #################
     #core attributes#
+        self._coords = False
         self.smiles = smiles
+        self.atoms = atoms
         self.coords = coords
         self.conformers = conformers
         self.energy = energy
         self.constraints = constraints
         self.tags = tags
         self.warnings = warnings
-        self.atoms = atoms
         self.charge = charge
         self.mult = mult
         self.properties = properties
@@ -96,7 +96,9 @@ class Mol:
     def atoms(self,new_atoms):
         self._atoms = new_atoms
         self._natoms = len(new_atoms)
-        self.update_geometry()
+        if self._coords:
+            self.update_geometry()
+            self._coords = True
 
     @property
     def coord(self):
@@ -108,7 +110,8 @@ class Mol:
             raise IndexError('Length of atoms is {0}, length of coords is {1}'.format(len(self.atoms),len(self.coords)))
 
         #make a numpy array of float points for consistency
-        new_coords = np.array(new_coords,dtype=np.float)
+        new_coords = np.array(new_coords,dtype=np.float64)
+        log(type(new_coords[0][0]))
 
         self.coords = new_coords
         self.update_geometry()
