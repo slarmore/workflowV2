@@ -11,11 +11,24 @@ import itertools
 from .message import warning,log,display
 from .config import max_conformers
 
+#######################################################################################################
+#class for freezing the attributes of mol object
+class FrozenClass(object):
+    __isfrozen = False
+    def __setattr__(self, key, value):
+        if self.__isfrozen and key not in dir(self):
+            raise TypeError( "Cannot add attribute to {0}, use .tags dict to store information".format(self))
+        object.__setattr__(self, key, value)
+
+    def _freeze(self):
+        self.__isfrozen = True
+
+
 
 #######################################################################################################
 #Mol object
 
-class Mol:
+class Mol(FrozenClass):
     '''Main molecule class'''
     def __init__(self,
                 atoms,
@@ -56,6 +69,10 @@ class Mol:
     ####################
     #derived attributes#
         self.get_rdkitmol()
+
+
+        #don't allow any new attribute to be defined
+        self._freeze()
 
     def get_xyz(self):
         if len(self.atoms) != len(self.coords):
@@ -248,7 +265,7 @@ class Mol:
 #######################################################################################################
 #Conformer object
 
-class Conformer:
+class Conformer(FrozenClass):
     '''a container to store conformers - its a lighter weight version of the mol object'''
     def __init__(self,
                     atoms,
@@ -275,6 +292,9 @@ class Conformer:
         self.mult = mult
         self._natoms = len(self.atoms)
         self.smiles = smiles
+
+        #don't allow any new attribute to be defined
+        self._freeze()
 
     def get_xyz(self):
         if len(self.atoms) != len(self.coords):
