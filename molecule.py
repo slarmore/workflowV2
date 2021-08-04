@@ -52,7 +52,7 @@ class Mol(FrozenClass):
     #################
     #core attributes#
         self._coords = False
-        self.atoms = atoms
+        self._atoms = atoms
         self.coords = coords
         self.conformers = conformers
         self.energy = energy
@@ -283,7 +283,7 @@ class Conformer(FrozenClass):
             raise IndexError('Length of atoms is {0}, length of coords is {1}'.format(len(atoms),len(coords)))
 
         self._coords = False
-        self.atoms = atoms
+        self._atoms = atoms
         self.coords = coords
         self.energy = energy
         self.constraints = constraints
