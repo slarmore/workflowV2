@@ -316,7 +316,7 @@ class Conformer:
 
         #make a numpy array of float points for consistency
         self.coords = np.array(new_coords,dtype=np.float64)
-        display(type(self.coords[0][0]))
+        log(type(self.coords[0][0]))
         self.update_geometry()
 
     @property
