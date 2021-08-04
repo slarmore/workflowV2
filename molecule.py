@@ -48,7 +48,7 @@ class Mol:
         self.charge = charge
         self.mult = mult
         self.properties = properties
-        self.natoms = len(self.atoms)
+        self._natoms = len(self.atoms)
 
     ####################
     #derived attributes#
@@ -89,6 +89,15 @@ class Mol:
     #restrict access to some Mol properties that user
     #shouldn't touch, or ensure updates to the rest of the info
     @property
+    def atoms(self):
+        return(self.atoms)
+
+    @atoms.setter
+    def atoms(self,new_atoms):
+        self._natoms = len(new_atoms)
+        self.update_geometry()
+
+    @property
     def coord(self):
         return(self.coord)
 
@@ -101,7 +110,7 @@ class Mol:
 
     @property
     def natoms(self):
-        return(self.natoms)
+        return(self._natoms)
 
 ###################
 #File IO functions#
