@@ -90,7 +90,7 @@ def CREST(mol,jobname,runtype,nproc=1,mem=1,time=default_time,partition=default_
                 constrained_atoms.append(constraint[3]+1)
         
         constraintfile.append('force constant={0}'.format(crest_constraint_force_constrant))
-        constraintfile.append('reference={0}.ref'.format(jobname))
+        constraintfile.append('reference={0}-try{1}.ref'.format(jobname,try_count))
         constraintfile.append('$metadyn')
 
         #get the list of atoms NOT constrained to include in the metadynamics
