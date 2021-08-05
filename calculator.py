@@ -176,9 +176,9 @@ def RunBatch(calculators,jobname='batch_job',max=50,tries=1):
             #submit the job
             log('submitting - sbatch {0}'.format(jobname))
             p = subprocess.Popen('sbatch {0}.sbatch'.format(jobname), stdout=subprocess.PIPE, shell=True,cwd=jobname)
-            output, err = p.communicate()
+            sbatch_output, err = p.communicate()
             p_status = p.wait()
-            slurmID = str(output).strip().split()[-1][:-3]
+            slurmID = str(sbatch_output).strip().split()[-1][:-3]
 
         
             #gather the output and account for failures
