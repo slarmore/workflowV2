@@ -581,7 +581,8 @@ def excited_states(mol,line_number,line,output_lines,calculator):
     states = []
 
     line_number += 2 #get to the first Excited State line
-
+    line = output_lines[line_number]
+    
     while re.search('Excited State',line):
         state_dict = {}
         line = line.split()
