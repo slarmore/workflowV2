@@ -10,6 +10,7 @@ from .utils import hartree2kcal
 import itertools
 from .message import warning,log,display
 from .config import max_conformers
+import pickle
 
 #######################################################################################################
 #class for freezing the attributes of mol and conformer objects
@@ -185,6 +186,10 @@ class Mol(FrozenClass):
             
         else:
             raise IndexError('No conformers present')
+
+    def checkpoint(self,outfile):
+        with open(outfile,'wb') as chk:
+            pickle.dump(self,chk)
 
 ###########################################################################
 #copy method to prevent changing original object with updated calculations#
@@ -493,6 +498,9 @@ def SmilesToMol(smiles,
                     charge=charge,mult=mult))
 
 
+def ReadCheckpoint(infile):
+    with open(infile,'rb') as chk:
+        return(pickle.load(chk))
 
 
 
