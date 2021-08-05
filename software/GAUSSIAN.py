@@ -598,7 +598,7 @@ def excited_states(mol,line_number,line,output_lines,calculator):
         transitions = []
         while re.search('->',line):
             line = line.split()
-            transitions.append(' '.join(line[0:1],float(line[2])))
+            transitions.append(' '.join(line[0:1]),float(line[2]))
             line_number += 1
             line = output_lines[line_number]
 
