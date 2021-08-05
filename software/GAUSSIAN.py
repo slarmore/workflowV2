@@ -586,10 +586,10 @@ def excited_states(mol,line_number,line,output_lines,calculator):
 
         display(line)
 
-        state_dict['character'] = line[4]
-        state_dict['energy'] = float(line[5])
-        state_dict['wavelength'] = float(line[7])
-        state_dict['f'] = float(line[9].split('=')[-1])
+        state_dict['character'] = line[3]
+        state_dict['energy'] = float(line[4])
+        state_dict['wavelength'] = float(line[6])
+        state_dict['f'] = float(line[8].split('=')[-1])
         next_line = output_lines[line_number+1].split()
         state_dict['transition'] = (' '.join(next_line[0:1]),float(next_line[2]))
 
