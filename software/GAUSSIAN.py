@@ -241,7 +241,7 @@ class gaussian:
                              'armonic frequencies': frequencies,       #want to match both Harmonic and Anharmonic
                              'SCF Error SCF Error SCF Error SCF Error': scf_error,
                              'Total Energy, E': tddft_energy,
-                             'Excited State': excited_states
+                             'Excitation energies and oscillator strengths': excited_states
 
         }
 
@@ -580,32 +580,41 @@ def excited_states(mol,line_number,line,output_lines,calculator):
 
     states = []
 
+    line_number += 2 #get to the first Excited State line
+
     while re.search('Excited State',line):
         state_dict = {}
         line = line.split()
-
-        display(line)
 
         state_dict['character'] = line[3]
         state_dict['energy'] = float(line[4])
         state_dict['wavelength'] = float(line[6])
         state_dict['f'] = float(line[8].split('=')[-1])
-        next_line = output_lines[line_number+1].split()
-        state_dict['transition'] = (' '.join(next_line[0:1]),float(next_line[2]))
 
-        states.append(state_dict.copy())
-    
-        display(state_dict)
-
-
-        #check if this is the state of interest
-        if re.search('This state for',output_lines[line_number+2]):
-            #jump 6 lines ahead and look for next state
-            line_number += 6
+        #get all of the orbital transitions
+        line_number += 1
+        line = output_lines[line_number]
+        transitions = []
+        while re.search('->',line):
+            line = line.split()
+            transitions.append(' '.join(line[0:1],float(line[2])))
+            line_number += 1
             line = output_lines[line_number]
+
+        state_dict['transition'] = transitions.copy()
+        states.append(state_dict.copy())
+
+        #find the next excited state line
+        #there is either a blank line, 
+        #or a message about the state for optimization, 
+        #then a blank line in between
+
+        if re.search('This state for optimization',line):
+            line_number += 4
+            line = output_lines[line_number]
+        
         else:
-            #jump 3 lines ahead and look for the next state
-            line_number += 3
+            line_number += 1
             line = output_lines[line_number]
 
     mol.properties['excited_states'] = states
