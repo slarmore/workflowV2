@@ -67,7 +67,7 @@ def CREST(mol,jobname,runtype,nproc=1,mem=1,time=default_time,partition=default_
     if len(mol.constraints) > 0:
         if not '-subrmsd' in arguments:
             arguments.append('-subrmsd')
-        arguments.append('-cinp constraint.c'.format(jobname))
+        arguments.append('-cinp {0}-try{1}.c'.format(jobname,try_count))
 
         constraintfile = ['$constrain']
         
@@ -136,9 +136,8 @@ def CREST(mol,jobname,runtype,nproc=1,mem=1,time=default_time,partition=default_
     arguments = ' '.join(arguments)
 
     #execution command
-    #CREST has a bug where it doesn't do a good job of reading .c files
-    #whose names are too long, so just rename it constraint.c
-    command = 'mv {5}-try{6}.c constrain.c\nulimit -s unlimited\nexport OMP_STACKSIZE={0}G\nexport OMP_NUM_THREADS={1},1\n{2} INPUTFILE -xnam {3} -T {1} {4} > OUTPUTFILE'.format(mem,nproc,crest_exe,xtb_exe,arguments,jobname,try_count)
+
+    command = 'ulimit -s unlimited\nexport OMP_STACKSIZE={0}G\nexport OMP_NUM_THREADS={1},1\n{2} INPUTFILE -xnam {3} -T {1} {4} > OUTPUTFILE'.format(mem,nproc,crest_exe,xtb_exe,arguments,jobname,try_count)
 
 
 ##########################################################
