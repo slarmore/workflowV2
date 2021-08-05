@@ -241,8 +241,8 @@ class gaussian:
                              'armonic frequencies': frequencies,       #want to match both Harmonic and Anharmonic
                              'SCF Error SCF Error SCF Error SCF Error': scf_error,
                              'Total Energy, E': tddft_energy,
-                             'Excitation energies and oscillator strengths': excited_states
-
+                             'Excitation energies and oscillator strengths': excited_states,
+                             'Number of steps exceeded': steps_exceeded
         }
 
         #precompile all the regrex for efficiency's sake
@@ -295,75 +295,99 @@ class gaussian:
 
         #not very elegant, but loop through the list and 
         #add keywords to fix any known errors
-        
-        if 'Non-Optimized' in mol.warnings:
-            log('Fixed Non-Optimized Error')
-            #check if frequencies were sucessfully computed
-            if 'frequecies' in mol.properties:
-                if 'opt' in kwargs:
-                    current = kwargs['opt']
-                    if re.search('calcall',current):
-                        pass
-                    #need a way to remove 'calcfc' but not remove 'recalcfc'
-                    elif not re.search('readfc',current):
-                        kwargs['opt'] = current + ',readfc'
+
+        if 'out_of_optimization_steps' in mol.warnings:
+            #if the opt keyword was specified
+            if 'opt' in kwargs:
+                current = kwargs['opt']
+                #add maxstep if not present
+                if not re.search('maxstep',current):
+                    kwargs['opt'] = current + ',maxstep=10'
+                #if has calcall, ignore
+                if re.search('calcall',current):
+                    pass
+                #if already has recalcfc, ignore
+                elif re.search('recalcfc',current):
+                    pass
+                #if has just calcfc, then replace with recalcfc
+                elif re.search('calcfc',current):
+                    kwargs['opt'] = current.replace('calcfc','recalcfc=10')
                 else:
-                    kwargs['opt'] = 'readfc'
+                    kwargs['opt'] =  current + ',recalcfc=10'
+            #if opt keyword was not specified
             else:
-                if 'opt' in kwargs:
-                    current = kwargs['opt']
-                    if re.search('calcall',current):
-                        pass
-                    elif not re.search('calcfc',current):
-                        kwargs['opt'] = current + ',calcfc'
-                else:
-                    kwargs['opt'] = 'calcfc'
+                kwargs['opt'] = 'recalcfc=10'
 
-            kwargs['geom'] = 'check'
-            kwargs['guess'] = 'read'
-            kwargs['oldchk'] = '{0}.chk'.format(input_name)
+        if 'Non-Optimized' in mol.warnings:
+            #let the out_of_optimization_steps failure handle it 
+            #if it ran out of steps
+            if not 'out_of_optimization_steps' in mol.warnings:
+                kwargs = add_or_read_fc(mol,input_name,kwargs)
+                log('Fixed Non-Optimized Error')
 
-        
         if 'SCF_Error' in mol.warnings:
-            log('Fixed SCF_Error')
             if 'scf' in kwargs:
                 current = kwargs['scf']
                 if not re.search('qc'):
-                    kwargs['scf'] == current + ',qc'
+                    kwargs['scf'] = current + ',qc'
             else:
                 kwargs['scf'] = 'qc'
-        
-        if 'negative_frequency' in mol.warnings:
-            TS = kwargs['TS']
-            if TS:
-            #check for saddle point
-                if 'frequencies' in mol.properties:
-                    if mol.properties['frequencies'][1] < 0:
-                        log('Fixed saddle point')
-                        if 'opt' in kwargs:
-                            current = kwargs['opt']
-                            if not re.search('readfc',current):
-                                kwargs['opt'] = current + ',readfc'
-                    
-                        kwargs['geom'] = 'check'
-                        kwargs['guess'] = 'read'
-                        kwargs['oldchk'] = '{0}.chk'.format(input_name)
-        
-            else:
-            #check for TS
-                log('Fixed negative frequency')
-                if 'opt' in kwargs:
-                    current = kwargs['opt']
-                    if not re.search('readfc',current):
-                        kwargs['opt'] = current + ',readfc'
-                else:
-                    kwargs['opt'] = 'readfc'
+            
+            log('Fixed SCF_Error')
 
-                kwargs['geom'] = 'check'
-                kwargs['guess'] = 'read'
-                kwargs['oldchk'] = '{0}.chk'.format(input_name)
+        if 'negative_frequency' in mol.warnings:
+            kwargs = add_or_read_fc(mol,input_name,kwargs)
+            log('Fixed negative_frequency')
+
+        if 'saddle_point' in mol.warnings:
+            kwargs = add_or_read_fc(mol,input_name,kwargs)
+            log('Fixed saddle_point')
+            
+        #read in the geometry, guess, and set the oldchk
+        kwargs['geom'] = 'check'
+        kwargs['guess'] = 'read'
+        kwargs['oldchk'] = '{0}.chk'.format(input_name)
 
         return(kwargs)
+
+
+def add_or_read_fc(mol,input_name,kwargs):
+ #check if frequencies were sucessfully computed
+    if 'frequecies' in mol.properties:
+        #if the opt keyword was specified
+        if 'opt' in kwargs:
+            current = kwargs['opt']
+            if re.search('calcall',current):
+                pass
+            #if its recalcfc, add readfc so the first is read
+            elif re.search('recalcfc',current):
+                kwargs['opt'] = current + ',readfc'
+            #if it's just calcfc, then read in the fc, replacing calcfc
+            elif re.search('calcfc',current):
+                kwargs['opt'] = current.replace('calcfc','readfc')
+            else:
+                kwargs['opt'] = current + ',readfc'
+        #if no opt keyword was specified, create it
+        else:
+            kwargs['opt'] = 'readfc'
+    #if no frequencies availible, use calcfc
+    else:
+        #if the opt keyword is specified
+        if 'opt' in kwargs:
+            current = kwargs['opt']
+            if re.search('calcall',current):
+                pass
+            elif re.search('recalcfc',current):
+                pass
+            elif re.search('calcfc',current):
+                pass
+            else:
+                kwargs['opt'] = current + ',calcfc'
+        #if opt keyword is not specified
+        else:
+            kwargs['opt'] = 'calcfc'
+
+    return(kwargs)
 
 #################
 #resubmit method#
@@ -475,7 +499,6 @@ def thermal_energies(mol,line_number,line,output_lines,calculator):
     #assume that the free energy is always the best to use
     mol.energy = free_energy
 
-
 def geometry(mol,line_number,line,output_lines,calculator):
     global step
     step += 1
@@ -551,23 +574,24 @@ def frequencies(mol,line_number,line,output_lines,calculator):
         
         '''.format(calculator.jobname))
 
-        mol.warnings.append('negative_frequency')
+        mol.warnings.append('saddle_point')
 
     elif freqs[0] < 0:
-        warning('''Negative frequency present for {0}
+        if not calculator.kwargs['TS']:
+            warning('''Negative frequency present for {0}
 
-        The mol.warnings = ['negative_frequency']
-        
-        Ignore if this is a TS, otherwise it's reccomended
-        to resubmit reading the force constants in
-        
-        '''.format(calculator.jobname))
+            The mol.warnings = ['negative_frequency']
+            
+            Ignore if this is a TS, otherwise it's reccomended
+            to resubmit reading the force constants in
+            
+            '''.format(calculator.jobname))
 
-        mol.warnings.append('negative_frequency')
+            mol.warnings.append('negative_frequency')
 
 def tddft_energy(mol,line_number,line,output_lines,calculator):
     mol.energy = float(line.split()[-1])
-    mol.properties['tddft_energy'] = float(line.split()[-1])
+    mol.properties['excited_state_energy'] = float(line.split()[-1])
 
 def excited_states(mol,line_number,line,output_lines,calculator):
     #create a list of dictionaries
@@ -602,7 +626,7 @@ def excited_states(mol,line_number,line,output_lines,calculator):
             line_number += 1
             line = output_lines[line_number]
 
-        state_dict['transition'] = transitions.copy()
+        state_dict['transitions'] = transitions.copy()
         states.append(state_dict.copy())
 
         #find the next excited state line
@@ -619,4 +643,20 @@ def excited_states(mol,line_number,line,output_lines,calculator):
             line = output_lines[line_number]
 
     mol.properties['excited_states'] = states
+
+def steps_exceeded(mol,line_number,line,output_lines,calculator):
+    #this indicates Gaussian ran out of steps in the geometry optimization
+    #add a warning since this structure is not fully optimized
+
+    warning('''Ran out of optimization steps for {0}
+
+    The mol.warnings = ['Non-out_of_optimization_steps']
+    
+    It's reccomended to resubmit with a smaller maxstep
+    and with calculating force constants regularly
+    with recalcfc=10   
+
+    '''.format(calculator.jobname))
+
+    mol.warnings.append('out_of_optimization_steps')
 
