@@ -291,6 +291,11 @@ class gaussian:
 
         return(calculator.mol)
 
+#################
+#resubmit method#
+    def resubmit(self,kwargs,try_count):
+        return(GAUSSIAN(**kwargs,try_count=try_count))
+
 ###################
 #fix_errors method#
     def fix_errors(self,mol,input_name,kwargs):
@@ -391,10 +396,6 @@ def add_or_read_fc(mol,input_name,kwargs):
 
     return(kwargs)
 
-#################
-#resubmit method#
-    def resubmit(self,kwargs,try_count):
-        return(GAUSSIAN(**kwargs,try_count=try_count))
 
 
 
