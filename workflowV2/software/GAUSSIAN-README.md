@@ -9,7 +9,7 @@ from workflowV2 import molecule
 from workflowV2.calculator import Run
 
 mol = molecule.SmilesToMol('C1=CC=CC=C1')
-calc = GAUSSIAN(mol,runtype='opt_freq',method='HF/6-31G') 
+calc = GAUSSIAN(mol,jobname='benzene_opt',runtype='opt_freq',method='HF/6-31G') 
 result = Run(calc)
 ```
 
