@@ -94,6 +94,8 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time=default_time,partitio
     for key, value in kwargs.items():
         if key in maintypes:
             pass
+        elif value is None:
+            pass
         elif key in supported_runtypes[runtype]:
             if key == 'afterinput':
                 afterinputsection.extend([value,''])
