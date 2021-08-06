@@ -220,8 +220,20 @@ class Mol(FrozenClass):
         then re-rank the conformers with relative energies'''
 
         #take the generic calculator and apply it to each conformre
-        calculators = [calculator_class(conf,jobname=jobname+'-{0}'.format(index),**kwargs) for index,conf in enumerate(self.conformers)]
+        #calculators = [calculator_class(conf,jobname=jobname+'-{0}'.format(index),**kwargs) for index,conf in enumerate(self.conformers)]
         
+        #look for {conf} in any of the kwarg values and replace with conformer #
+        #this will allow specification of specific oldchk file for each conformer
+        #when restarting a gaussian calculation
+        calculators = []
+        for index,conf in enumerate(self.conformers):
+            local_kwargs = kwargs.copy()
+            for key, value in local_kwargs.items():
+                if  isinstance(value,str):
+                    local_kwargs[key] = value.replace('{conf}',str(index))
+            calculators.append(calculator_class(conf,jobname=jobname+'-{0}'.format(index),**local_kwargs))
+
+
         conformers = calculator.RunBatch(calculators,jobname,tries=tries)
         conformers.sort(key=lambda x: x.energy)
         energies = np.array([conf.energy for conf in conformers])
