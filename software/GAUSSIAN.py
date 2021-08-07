@@ -131,7 +131,10 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time=default_time,partitio
                 '{0} {1}'.format(mol.charge,mol.mult)])
 
         if not 'geom' in kwargs:
-            com.append(mol.xyzstring),
+            com.append(mol.xyzstring)
+        else:
+            if kwargs['geom'] is None:
+                com.append(mol.xyzstring)
         com.append('')
 
         if len(afterinputsection) > 0:
@@ -180,7 +183,7 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time=default_time,partitio
         else:
             if kwargs['geom'] is None:
                 com.append(mol.xyzstring)
-                
+
         com.append('')
 
         if len(afterinputsection) > 0:
