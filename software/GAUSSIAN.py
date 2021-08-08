@@ -589,7 +589,7 @@ def frequencies(mol,line_number,line,output_lines,calculator):
         mol.warnings.append('saddle_point')
 
     elif freqs[0] < 0:
-        if not calculator.kwargs['TS']:
+        if not calculator.argument_dict['TS']:
             warning('''Negative frequency present for {0}
 
             The mol.warnings = ['negative_frequency']
