@@ -93,7 +93,7 @@ class Calculator:
 #######################################################################################################
 #Running the calculators
 
-def Run(calculator,tries=1):
+def Run(calculator,tries=1,ignore=False):
     '''just submit a single job'''
 
 #######################
@@ -115,7 +115,7 @@ def Run(calculator,tries=1):
         if not calculator.mol.warnings[0] == 'First_submission':
             calculator = calculator.resubmit()
 
-        if calculator.try_count <= tries:
+        if calculator.try_count < tries:
             sbatch_name = '{0}-try{1}.sbatch'.format(calculator.jobname,calculator.try_count)
             with open('{0}{1}'.format(calculator.dir,sbatch_name),'w') as sbatch: #directory is already ended with /
                 sbatch.write(generic_single(calculator))
@@ -129,15 +129,18 @@ def Run(calculator,tries=1):
             slurmoutput = '{0}{1}-{2}.out'.format(calculator.dir,calculator.jobname,slurmID) #directory is already ended with /
 
             calculator.mol = calculator.program.read_output(calculator,slurmoutput)
-
+        
         else:
-            raise IndexError('Ran out of resubmission tries')
+            if ignore:
+                return(calculator.mol)
+            else:
+                raise IndexError('Ran out of resubmission tries')
 
     return(calculator.mol)
 
 
 
-def RunBatch(calculators,jobname='batch_job',max=50,tries=1):
+def RunBatch(calculators,jobname='batch_job',max=50,tries=1,ignore=False):
     '''Take a list of calculators and run all of them as a slurm array - assume they all have the same resources as the first one'''
     
 #######################
@@ -197,7 +200,10 @@ def RunBatch(calculators,jobname='batch_job',max=50,tries=1):
             need_resub = new_need_resub
 
         else:
-            raise IndexError('Ran out of resubmission tries')
+            if ignore:
+                return(output)
+            else:
+                raise IndexError('Ran out of resubmission tries')
     
     return(output)
 
