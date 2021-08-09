@@ -2,7 +2,6 @@
 
 ########################################################################################################
 #imports
-from shutil import Error
 from .. import calculator
 from .. import molecule
 from ..config import * #this is where the g16 exe is defined
@@ -16,7 +15,7 @@ import os
 
 ########################################################################################################
 #calculator creation function
-def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time=default_time,partition=default_partition,oldchk=None,TS=False,try_count=0,delete=['*.chk','Gau*'],**kwargs):
+def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time=default_time,partition=default_partition,oldchk=None,TS=False,try_count=0,delete=['Gau*'],**kwargs):
     '''Create calculator object for Gaussian calculation'''
     
 
@@ -253,7 +252,8 @@ class gaussian:
                              'SCF Error SCF Error SCF Error SCF Error': scf_error,
                              'Total Energy, E': tddft_energy,
                              'Excitation energies and oscillator strengths': excited_states,
-                             'Number of steps exceeded': steps_exceeded
+                             'Number of steps exceeded': steps_exceeded,
+                             '%chk=' : chk_file
         }
 
         #precompile all the regrex for efficiency's sake
@@ -421,6 +421,9 @@ def electronic_energies(mol,line_number,line,output_lines,calculator):
     else:
         mol.properties['optimization_energies'] = [energy]
 
+def chk_file(mol,line_number,line,output_lines,calculator):
+    chk_file_name = line.split('=')[-1]
+    mol.tags['chk'] = chk_file_name
 
 def orbital_energies(mol,line_number,line,output_lines,calculator):
     ''' put all of the occupied orbitals into the occupied_orbital_energies thing and all the unoccupied in its own'''
