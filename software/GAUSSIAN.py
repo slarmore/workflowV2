@@ -16,7 +16,7 @@ import os
 
 ########################################################################################################
 #calculator creation function
-def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time=default_time,partition=default_partition,oldchk=None,TS=False,try_count=0,**kwargs):
+def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time=default_time,partition=default_partition,oldchk=None,TS=False,try_count=0,delete=['*.chk','Gau*'],**kwargs):
     '''Create calculator object for Gaussian calculation'''
     
 
@@ -220,7 +220,7 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time=default_time,partitio
                 mem=mem,
                 time=time,
                 partition=partition,
-                program=gaussian(),
+                program=gaussian(delete=delete),
                 mol=mol,
                 argument_dict=argument_dict,
                 try_count=try_count))
@@ -233,13 +233,13 @@ class gaussian:
 
 ###################
 #define attributes#
-    def __init__(self):
+    def __init__(self,delete=['*.chk','Gau*']):
         self.program_name = 'gaussian'
         self.infiles = ['com']
         self.outfiles = ['log']
         self.normal_termination_line = -1   #where to look to see if calculation was successful
         self.normal_termination_string = 'Normal termination of Gaussian'   #what to look for
-        self.unessesary_files = ['Gau*']
+        self.unessesary_files = delete
 
     #######################################
     #keywords to search for in output file#

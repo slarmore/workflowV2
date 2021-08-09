@@ -60,7 +60,7 @@ if not mol:
     mol.tags['step'] = 0
 
 
-#determine which is the product by comparing atom distances
+#calculate atom distances
 def distance(x1,y1,z1,x2,y2,z2):
     return(np.sqrt(   ((x1-x2)**2 ) + ((y1-y2)**2 ) + ((z1-z2)**2 ) ))
 
@@ -129,17 +129,18 @@ if mol.tags['step'] < 3:
                          scrf='iefpcm,solvent={0}'.format(solvent_dict['gaussian']),
                          nproc=nproc,
                          mem=mem,
-                         oldchk=oldchk,
-                         geom=geom,
-                         guess=guess,
                          tries=1,
-                         TS=True,
                          time=time)
 
     mol.tags['step'] = 3
     mol.checkpoint('{0}.chk'.format(input_name))
     mol.checkpoint('{0}-preopt.mol'.format(input_name))
 
+    os.chdir('../')
+
+    mol.tags['step'] = 3
+    mol.checkpoint('{0}.chk'.format(input_name))
+    mol.checkpoint('{0}-preopt.mol'.format(input_name))
 
 ##################################################################
 
@@ -227,8 +228,7 @@ if mol.tags['step'] < 4:
             break
 
     if not valid_TS:
-        raise raise IndexError('No valid TSs')
-
+        raise IndexError('No valid TSs')
 
     #write out the TS energy from the lowest valid TS
     df = pd.DataFrame([[mol.conformers[valid_TS].properties['free_energy']]],columns=['TS'])
@@ -243,6 +243,7 @@ if mol.tags['step'] < 4:
 if mol.tags['step'] < 5:
 
     #take the lowest energy valid TS
+    #read from the tags in case this is a restarted run
     mol = mol.conformers[mol.tags['valid_TS']]
 
     mol.ToXYZ('{0}-lowest_conf.xyz'.format(input_name))
@@ -537,4 +538,4 @@ if mol.tags['step'] < 11:
 
 ##################################################################
 
-print('Done!')
+message.log('Done!')

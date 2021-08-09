@@ -16,7 +16,7 @@ import os
 
 ########################################################################################################
 #calculator creation function
-def CREST(mol,jobname,runtype,nproc=1,mem=1,time=default_time,partition=default_partition,max_confs=500,try_count=0,**kwargs):
+def CREST(mol,jobname,runtype,nproc=1,mem=1,time=default_time,partition=default_partition,max_confs=500,try_count=0,delete=['METADYN*','MRMSD','NORMMD*','*.tmp','wbo'],**kwargs):
     '''Create calculator object for CREST conformer generation'''
     
 
@@ -160,7 +160,7 @@ def CREST(mol,jobname,runtype,nproc=1,mem=1,time=default_time,partition=default_
                 mem=mem,
                 time=time,
                 partition=partition,
-                program=crest(),
+                program=crest(delete=delete),
                 mol=mol,
                 argument_dict=argument_dict,
                 try_count=try_count))
@@ -173,13 +173,13 @@ class crest:
 
 ###################
 #define attributes#
-    def __init__(self):
+    def __init__(self,delete=['METADYN*','MRMSD','NORMMD*','*.tmp','wbo']):
         self.program_name = 'crest'
         self.infiles = ['xyz','c','ref']
         self.outfiles = ['out']
         self.normal_termination_line = -1   #where to look to see if calculation was successful
         self.normal_termination_string = 'CREST terminated normally.'   #what to look for
-        self.unessesary_files = ['METADYN*','MRMSD','NORMMD*','*.tmp','wbo']
+        self.unessesary_files = delete
 
     #######################################
     #keywords to search for in output file#
