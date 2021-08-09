@@ -24,6 +24,6 @@ Submit some kind of calculation to update the Mol Object
 For example, creating a Gaussian calculator to optimize the input Mol Object would return a Mol Object with updated coordinates, energies, orbital energies, vibrational modes, etc. 
 
 ## Creating Workflows
-The power of this codebase is not for individual calculations. Often those are easy enough to set up and manage by hand. Rather, it is the ability to script together complex workflows, passing the Mol Object form one calculator to the next, automating many calculations. 
+The power of this codebase is not for individual calculations. Often those are easy enough to set up and manage by hand. Rather, it's power is in the ability to script together complex workflows, passing the Mol Object form one calculator to the next, automating many calculations. 
 
 ![alt text](Workflow.png)
