@@ -9,21 +9,21 @@ More here soon!
 
 
 
-# The Mol Object
+## The Mol Object
 The central piece to this package is the **Mol Object**. 
 
 ![alt text](Mol_Object.png)
 
 The Mol Object stores all of the 3D information, propreties, conformers, energies, tags, etc for a molecule. The central theme of this codebase is manipulating these Mol Objects with calculators that will modify the Mol Object in some way. The Mol Object can be passed to a calculator, which will return an updated Mol Object. 
 
-# Calculators
+## Calculators
 Submit some kind of calculation to update the Mol Object
 
 ![alt text](Calculator.png)
 
 For example, creating a Gaussian calculator to optimize the input Mol Object would return a Mol Object with updated coordinates, energies, orbital energies, vibrational modes, etc. 
 
-# Creating Workflows
+## Creating Workflows
 The power of this codebase is not for individual calculations. Often those are easy enough to set up and manage by hand. Rather, the ability to script together complex workflows, passing the Mol Object form one calculator to the next, automating many calculations. 
 
 ![alt text](Workflow.png)
