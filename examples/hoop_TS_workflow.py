@@ -6,12 +6,13 @@
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=20G
-#SBATCH --time=1-00:00:00
+#SBATCH --time=6:00:00
 
 solvent_dict = {'crest':'DMSO','gaussian':'dimethylsulfoxide'}
 dftmethod = 'M062X/6-31G'
 nproc = 12
 mem = 60
+time = '6:00:00'
 
 ###################################################################
 
@@ -27,6 +28,11 @@ import numpy as np
 
 
 input_file = sys.argv[1]
+atom1 = int(sys.argv[2])
+atom2 = int(sys.argv[3])
+atom3 = int(sys.argv[4])
+atom4 = int(sys.argv[5])
+
 
 input_name = input_file.split('.')[0]
 
@@ -48,15 +54,16 @@ if os.path.exists('{0}.chk'.format(input_name)):
     message.log('restarting at step {0}'.format(mol.tags['step']+1))
 
 if not mol:
-    atom1 = int(sys.argv[2])
-    atom2 = int(sys.argv[3])
-    atom3 = int(sys.argv[4])
-    atom4 = int(sys.argv[5])
-
     mol = molecule.XYZToMol(input_file)
     mol.constraints = [[atom1,atom2],[atom3,atom4]]
 
     mol.tags['step'] = 0
+
+
+#determine which is the product by comparing atom distances
+def distance(x1,y1,z1,x2,y2,z2):
+    return(np.sqrt(   ((x1-x2)**2 ) + ((y1-y2)**2 ) + ((z1-z2)**2 ) ))
+
 
 ##################################################################
 
@@ -76,10 +83,6 @@ if mol.tags['step'] < 1:
 
     mol = Run(conformer_calculator)
 
-    #release the constraints now that I have the conformers I needed
-    mol.constraints = []
-    for conformer in mol.conformers:
-        conformer.constraints = []
 
     os.chdir('../')
 
@@ -113,7 +116,39 @@ if mol.tags['step'] < 2:
 
 if mol.tags['step'] < 3:
 
+    #Optimize lowest10 conformers
+    os.makedirs('lowest10',exist_ok=True)
+    os.chdir('lowest10')
+
     mol.conformers = mol.conformers[0:10]
+
+    mol.RefineConformers(GAUSSIAN,
+                         jobname='{0}-preopt'.format(input_name),
+                         runtype='opt',
+                         method=dftmethod,
+                         scrf='iefpcm,solvent={0}'.format(solvent_dict['gaussian']),
+                         nproc=nproc,
+                         mem=mem,
+                         oldchk=oldchk,
+                         geom=geom,
+                         guess=guess,
+                         tries=1,
+                         TS=True,
+                         time=time)
+
+    mol.tags['step'] = 3
+    mol.checkpoint('{0}.chk'.format(input_name))
+    mol.checkpoint('{0}-preopt.mol'.format(input_name))
+
+
+##################################################################
+
+if mol.tags['step'] < 4:
+
+    #release the constraints now that I have the conformers I needed
+    mol.constraints = []
+    for conformer in mol.conformers:
+        conformer.constraints = []
 
     oldchk = None
     geom = None
@@ -141,8 +176,6 @@ if mol.tags['step'] < 3:
                 raise IndexError('Could not find chk to resubmit')
 
 
-    #Optimize lowest10 conformers
-    os.makedirs('lowest10',exist_ok=True)
     os.chdir('lowest10')
 
     mol.RefineConformers(GAUSSIAN,
@@ -156,24 +189,61 @@ if mol.tags['step'] < 3:
                          oldchk=oldchk,
                          geom=geom,
                          guess=guess,
-                         tries=3)
+                         tries=3,
+                         TS=True,
+                         time=time)
 
     os.chdir('../')
 
-    #write out the TS energy from the lowest conf
-    df = pd.DataFrame([[mol.conformers[0].properties['free_energy']]],columns=['TS'])
+    #check that the structure still resembles a TS
+    #we know the bond lengths for the forming bonds should be less than 3A
+    #take the first one that is a TS on to the next step
+
+    valid_TS = False
+    for index,conformer in enumerate(mol.conformers):
+        atom1_coords = mol.coords[atom1]
+        atom2_coords = mol.coords[atom2]
+
+        distance1 = distance(atom1_coords[0],
+                            atom1_coords[1],
+                            atom1_coords[2],
+                            atom2_coords[0],
+                            atom2_coords[1],
+                            atom2_coords[2])
+
+        atom3_coords = mol.coords[atom3]
+        atom4_coords = mol.coords[atom4]
+
+        distance2 = distance(atom3_coords[0],
+                            atom3_coords[1],
+                            atom3_coords[2],
+                            atom4_coords[0],
+                            atom4_coords[1],
+                            atom4_coords[2])
+
+        if distance1 < 3.0 and distance2 < 3.0:
+            valid_TS = index
+            mol.tags['valid_TS'] = index
+            break
+
+    if not valid_TS:
+        raise raise IndexError('No valid TSs')
+
+
+    #write out the TS energy from the lowest valid TS
+    df = pd.DataFrame([[mol.conformers[valid_TS].properties['free_energy']]],columns=['TS'])
     df.to_csv(output_energies,index=False)
 
-    mol.tags['step'] = 3
+    mol.tags['step'] = 4
     mol.checkpoint('{0}.chk'.format(input_name))
     mol.checkpoint('{0}-lowest10.mol'.format(input_name))
 
 ##################################################################
 
-if mol.tags['step'] < 4:
+if mol.tags['step'] < 5:
 
-    #take the lowest energy conformer
-    mol = mol.conformers[0]
+    #take the lowest energy valid TS
+    mol = mol.conformers[mol.tags['valid_TS']]
 
     mol.ToXYZ('{0}-lowest_conf.xyz'.format(input_name))
 
@@ -187,9 +257,10 @@ if mol.tags['step'] < 4:
                    scrf='iefpcm,solvent={0}'.format(solvent_dict['gaussian']),
                    irc='forward,calcfc',
                    nproc=nproc,
-                   mem=mem)
+                   mem=mem,
+                   time=time)
 
-    forward = Run(calc,tries=1)
+    forward = Run(calc,tries=1,ignore=True)
 
     os.chdir('../')
 
@@ -199,13 +270,13 @@ if mol.tags['step'] < 4:
 
     forward.ToXYZ('{0}-forward.xyz'.format(input_name))
 
-    mol.tags['step'] = 4
+    mol.tags['step'] = 5
     mol.checkpoint('{0}.chk'.format(input_name))
     forward.checkpoint('{0}-forward.mol'.format(input_name))
 
 #######################################################################
 
-if mol.tags['step'] < 5:
+if mol.tags['step'] < 6:
 
     os.chdir('IRC')
 
@@ -216,9 +287,10 @@ if mol.tags['step'] < 5:
                    scrf='iefpcm,solvent={0}'.format(solvent_dict['gaussian']),
                    irc='reverse,calcfc',
                    nproc=nproc,
-                   mem=mem)
+                   mem=mem,
+                   time=time)
 
-    reverse = Run(calc,tries=1)
+    reverse = Run(calc,tries=1,ignore=True)
 
     os.chdir('../')
 
@@ -228,13 +300,13 @@ if mol.tags['step'] < 5:
 
     reverse.ToXYZ('{0}-reverse.xyz'.format(input_name))
 
-    mol.tags['step'] = 5
+    mol.tags['step'] = 6
     mol.checkpoint('{0}.chk'.format(input_name))
     reverse.checkpoint('{0}-reverse.mol'.format(input_name))
 
 #######################################################################
 
-if mol.tags['step'] < 6:
+if mol.tags['step'] < 7:
 
     if not forward:
         forward = molecule.ReadCheckpoint('{0}-forward.mol'.format(input_name))
@@ -277,13 +349,13 @@ if mol.tags['step'] < 6:
 
     df.to_csv(output_energies,index=False)
 
-    mol.tags['step'] = 6
+    mol.tags['step'] = 7
     mol.checkpoint('{0}.chk'.format(input_name))
     product.checkpoint('{0}-product.mol'.format(input_name))
 
 ###############################################################
 
-if mol.tags['step'] < 7:
+if mol.tags['step'] < 8:
 
     if not product:
         product = molecule.ReadCheckpoint('{0}-product.mol'.format(input_name))
@@ -325,7 +397,8 @@ if mol.tags['step'] < 7:
                    oldchk=oldchk,
                    geom=geom,
                    check=check,
-                   mem=mem)
+                   mem=mem,
+                   time=time)
 
     product = Run(calc,tries=3)
 
@@ -337,13 +410,13 @@ if mol.tags['step'] < 7:
 
     product.ToXYZ('{0}-product.xyz'.format(input_name))
 
-    mol.tags['step'] = 7
+    mol.tags['step'] = 8
     mol.checkpoint('{0}.chk'.format(input_name))
     product.checkpoint('{0}-product-optimized.mol'.format(input_name))
 
 ################################################################
 
-if mol.tags['step'] < 8:
+if mol.tags['step'] < 9:
 
     if not product:
         product = molecule.ReadCheckpoint('{0}-product-optimized.mol'.format(input_name))
@@ -359,19 +432,20 @@ if mol.tags['step'] < 8:
                                  nproc=nproc,
                                  mem=mem,
                                  gbsa=solvent_dict['crest'],
-                                 max_confs=100)
+                                 max_confs=100,
+                                 time=time)
 
     mol = Run(conformer_calculator)
 
     os.chdir('../')
 
-    mol.tags['step'] = 8
+    mol.tags['step'] = 9
     mol.checkpoint('{0}.chk'.format(input_name))
     product.checkpoint('{0}-product-confsearch.mol'.format(input_name))
 
 ##################################################################
 
-if mol.tags['step'] < 9:
+if mol.tags['step'] < 10:
 
     if not product:
         product = molecule.ReadCheckpoint('{0}-product-confsearch.mol'.format(input_name))
@@ -386,17 +460,18 @@ if mol.tags['step'] < 9:
                          method=dftmethod,
                          scrf='iefpcm,solvent={0}'.format(solvent_dict['gaussian']),
                          nproc=nproc,
-                         mem=mem)
+                         mem=mem,
+                         time=time)
 
     os.chdir('../')
 
-    mol.tags['step'] = 9
+    mol.tags['step'] = 10
     mol.checkpoint('{0}.chk'.format(input_name))
     product.checkpoint('{0}-product-SP.mol'.format(input_name))
 
 ##################################################################
 
-if mol.tags['step'] < 10:
+if mol.tags['step'] < 11:
 
     if not product:
         product = molecule.ReadCheckpoint('{0}-product-SP.mol'.format(input_name))
@@ -443,7 +518,8 @@ if mol.tags['step'] < 10:
                          oldchk=oldchk,
                          geom=geom,
                          guess=guess,
-                         tries=3)
+                         tries=3,
+                         time=time)
 
     os.chdir('../')
 
@@ -452,7 +528,7 @@ if mol.tags['step'] < 10:
     df['global_minima_product'] = [product.conformers[0].properties['free_energy']]
     df.to_csv(output_energies,index=False)
 
-    mol.tags['step'] = 10
+    mol.tags['step'] = 11
     mol.checkpoint('{0}.chk'.format(input_name))
     product.checkpoint('{0}-product-lowest10.mol'.format(input_name))
 
@@ -462,4 +538,3 @@ if mol.tags['step'] < 10:
 ##################################################################
 
 print('Done!')
-
