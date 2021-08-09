@@ -73,3 +73,8 @@ calc = GAUSSIAN(mol,runtype='opt_freq',opt='calcfc'
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - `advanced_route_opts` - This is a catch-all keyword that will put anything passed to it directly on the route line, exactly as written: \
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `advanced_route_opts='banana formcheck'` is added to the route line as `banana formcheck` 
 
+### Misc. Arguments
+There are a few arguments that fall outside of any of the above categories the user should still be aware of:
+`delete` - This argument takes a list and should specify globbed matches for files to be deleted. For example, the default is `delete=['*.chk','Gau*']` which will delete the Gau-#####.* intermediate files and the .chk file. 
+`TS` - This argument does not affect the calculation setup whatsoever. It merely suppresses the warning for a single negative frequency if set to `True`.
+`try_count` - This argument should very rarely be set by the user. It is for internally keeping track of how many times a job has been resubmitted by the failure handler and there are no existing use cases for the user themselves to specify it directly. 
