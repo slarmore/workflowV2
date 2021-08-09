@@ -76,7 +76,63 @@ calc = GAUSSIAN(mol,runtype='opt_freq',opt='calcfc'
 ### Misc. Arguments
 There are a few arguments that fall outside of any of the above categories the user should still be aware of:\
 `delete` - This argument takes a list and should specify globbed matches for files to be deleted. \
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; For example, the default is `delete=['*.chk','Gau*']` which will delete the Gau-#####.* intermediate files and the .chk file. \
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; For example, the default is `delete=['Gau*']` which will delete the Gau-#####.* intermediate files if present. \
 `TS` - This argument does not affect the calculation setup whatsoever. It merely suppresses the warning for a single negative frequency if set to `True`.\
 `try_count` - This argument should very rarely be set by the user. \
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; It is for internally keeping track of how many times a job has been resubmitted by the failure handler and there are no existing use cases for the user themselves to specify it directly. 
+
+
+## Gaussian Results
+The results of gaussian calculations are stored in the updated Mol object that is returned by the calculator. 
+
+
+### Direclty updated Mol attributes
+`mol.energy` (float) - Updated with the calculated energy with the following priority
+  1. Free energy
+  2. Excited State Total Energy
+  3. Electronic energy
+
+`mol.coords` (np array of x,y,z coordinate floats) - Updated with the coordinates. \
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; This also updates all of the dependencies (`mol.xyz`, `mol.xyzstring`, etc)\
+`mol.warnings` - Any calculation warnings are put in a list in the warnings attribute. These warnings are used to resubmit failed calculations\
+
+### Updated in Mol tags attribute
+`mol.tags['chk']` (string) - Name of the calculation checkpoint file. This can be used to read the checkpoint into subsequent calculations
+
+### Updated in Mol properties attribute
+Most of the additional calculation information is stored here\
+There is also some redundancy with the energies parsed above 
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Energies** \
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `mol.properties['electronic_energy']`(float) - Electronic energy\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `mol.properties['optimization_energies']` (list of floats) - Electronic energy at each optimization step\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `mol.properties['thermal_correction']` (float) - thermal energy correction\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `mol.properties['enthalpy_correction']` (float) - enthalpy correction\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `mol.properties['free_energy_correction']` (float) - free energy correction\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `mol.properties['zero_point_corrected_energy']` (float) - zero point energy corrected energy\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `mol.properties['thermal_energy']` (float) - thermal energy\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `mol.properties['enthalpy']` (float) - enthalpy\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `mol.properties['free_energy']` (float) - free energy
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Orbitals** \
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `mol.properties['homo']` (float) - HOMO orbital energy\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `mol.properties['lumo']` (float) - LUMO orbital energy\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `mol.properties['occupied_orbitals']` (list of floats) - Occupied orbital energies\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `mol.properties['unoccupied_orbitals']` (list of floats) - Unoccupied orbital energies
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Coordinates** \
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `mol.properties['optimization_xyzs']` (list of strings) - a list of XYZ files, as strings, for each optimization geometry
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Vibrations** \
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `mol.properties['frequencies']` (np array of floats) - vibrational frequencies
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Excited state properties** \
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `mol.properties['excited_state_energy']` (float) - excited state energy (for the state of interest)\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `mol.properties['excited_states']` (list of dicts) - a list containing a dictionary for each excited state with the following keys:\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   - `'character'` - i.e. Singlet, triplet\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   - `'energy'` - energy in eVs\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   - `'wavelength'` - wavelength in nm\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   - `'f'` - oscillator strength\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   - `'transitions'` - a tuple of the (orbital_transitions,contribution)
+
+
