@@ -34,7 +34,7 @@ This code is designed to build quantum chemistry workflows, not submit individua
 <col style="width:50%">
 <thead>
 <tr>
-<td style="text-align: left; vertical-align:top;"> <p> The power of this codebase is not for individual calculations. <br />Often those are easy enough to set up and manage by hand.  <br />Rather, it's power is in the ability to script together complex workflows, <br />passing the Mol Object form one calculator to the next, automating <br />many calculations. </p> <p>The goal of this codebase is to prevent the need to string along <br />multiple sbatch scripts, copying files, converting, and relying <br />on pieced together customized solutions.</p> <p>Instead, by building out functionality from the central Mol Object, everything will connect nicely together and allow much more flexibility when designing automated pipelines. </td>
+<td style="text-align: left; vertical-align:top;"> <p> The power of this codebase is not for individual calculations. <br />Often those are easy enough to set up and manage by hand.  <br />Rather, it's power is in the ability to script together complex workflows, <br />passing the Mol Object form one calculator to the next, automating <br />many calculations. </p> By building out functionality from the central Mol Object, everything will connect nicely together and allow much more flexibility when designing automated pipelines compared to stringing together sbatch scripts and hoping for the best. </td>
 <td> <img src="Workflow.png" width="100%"/> </td>
 </tr>
 </thead>
