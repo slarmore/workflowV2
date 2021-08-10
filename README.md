@@ -32,7 +32,7 @@ This code is designed to build quantum chemistry workflows.
 <col style="width:50%">
 <thead>
 <tr>
-<td style="text-align: left; vertical-align:top;"> <p> The power of this codebase is not for individual  <br />calculations.  Often those are easy enough to set up <br /> and manage by hand.  Rather, it's utility is in the <br />ability to script together complex workflows, passing the <br />Mol Object form one calculator to the next, <br />automating many calculations. </p> By building out functionality from the central <br />Mol Object, everything will connect nicely together and allow much more flexibility when designing automated pipelines compared to stringing together sbatch scripts and hoping for the best. </td>
+<td style="text-align: left; vertical-align:top;"> <p> The power of this codebase is not for individual  <br />calculations.  Often those are easy enough to set up <br /> and manage by hand.  Rather, it's utility is in the <br />ability to script together complex workflows, passing the <br />Mol Object form one calculator to the next, <br />automating many calculations. </p> By building out functionality from the central <br />Mol Object, everything will connect nicely together <br />and allow much more flexibility when designing automated pipelines compared to stringing together sbatch scripts and hoping for the best. </td>
 <td> <img src="Workflow.png" width="150%"/> </td>
 </tr>
 </thead>
