@@ -18,3 +18,14 @@ setup(
     packages=find_packages(),
     long_description=read('README'),
 )
+
+try:
+    import rdkit
+except:
+    print(' - WARNING - \n\nworkflowV2 uses RDkit!\nRDkit was not found in this environment, please install before using workflowV2\\n')
+    
+try:
+    import numpy
+except:
+    print(' - WARNING - \n\nworkflowV2 uses numpy!\nnumpy was not found in this environment, please install before using workflowV2\n\n')
+    
