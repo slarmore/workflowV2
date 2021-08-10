@@ -12,14 +12,14 @@ More here soon!
 ## The Mol Object
 The central piece to this package is the **Mol Object**. 
 
-<img src="Mol_Object.png" width="75%"/>
+<img src="Mol_Object.png" width="75%" align="middle" />
 
 The Mol Object stores all of the 3D information, propreties, conformers, energies, tags, etc for a molecule. The central theme of this codebase is manipulating these Mol Objects with calculators that will modify the Mol Object in some way. The Mol Object can be passed to a calculator, which will return an updated Mol Object. 
 
 ## Calculators
 Submit some kind of calculation to update the Mol Object
 
-<img src="Calculator.png" width="75%"/>
+<img src="Calculator.png" width="75%" align="middle"/>
 
 For example, creating a Gaussian calculator to optimize the input Mol Object would return a Mol Object with updated coordinates, energies, orbital energies, vibrational modes, etc. 
 
