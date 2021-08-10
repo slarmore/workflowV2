@@ -1,9 +1,9 @@
 # workflow2.0
 
-A package for automating QM calculation workflows\
+A package for automating QM calculation workflows
 
 Inspired by RDkit and the Atomic Simulation Environment's design principles\
-but adapted for HPC job scheduler environment\
+but adapted for HPC job scheduler environment
 
 More here soon!
 
@@ -24,16 +24,19 @@ Submit some kind of calculation to update the Mol Object
 For example, creating a Gaussian calculator to optimize the input Mol Object would return a Mol Object with updated coordinates, energies, orbital energies, vibrational modes, etc. 
 
 ## Creating Workflows
-The power of this codebase is not for individual calculations. Often those are easy enough to set up and manage by hand. Rather, it's power is in the ability to script together complex workflows, passing the Mol Object form one calculator to the next, automating many calculations. 
+This code is designed to build quantum chemistry workflows, not submit individual calculations.
 
-<table style='width:100%'>
-  <tr>
-    <th>
-    Because the Mol Object is a standardized, copmartmentalized object, it can be passed back and forth between calculators without the need to write complex and highly specific slurm and bash scripts chained together.
-    
-    </th>
-    <th><img src="Workflow.png" width="50%"/></th>
-    
-    
-  </tr>
+
+
+
+<table>
+<col style="width:50%">
+<col style="width:50%">
+<thead>
+<tr>
+<td style="text-align: left; vertical-align:top;"> <p> The power of this codebase is not for individual calculations. <br />Often those are easy enough to set up and manage by hand.  <br />Rather, it's power is in the ability to script together complex workflows, <br />passing the Mol Object form one calculator to the next, automating <br />many calculations. </p> <p>The goal of this codebase is to prevent the need to string along <br />multiple sbatch scripts, copying files, converting, and relying <br />on pieced together customized solutions.</p> <p>Instead, by building out functionality from the central Mol Object, everything will connect nicely together and allow much more flexibility when designing automated pipelines. </td>
+<td> <img src="Workflow.png" width="100%"/> </td>
+</tr>
+</thead>
 </table>
+
