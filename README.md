@@ -1,4 +1,4 @@
-# workflow2.0
+# workflow2.0 Overview
 
 A package for automating QM calculation workflows
 
@@ -38,3 +38,31 @@ This code is designed to build quantum chemistry workflows.
 </thead>
 </table>
 
+# Installation
+The easiest way to install this code is by creating a new conda environment with the following yml file:
+``` 
+name: workflowV2_env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - rdkit
+  - pip
+  - pip:
+    - git+https://github.com/neal-p/workflowV2.git
+ ```
+ And is created with the bash command:
+ `conda env create -f workflowV2.yml`
+
+Alternatively, you can install directly with pip, **HOWEVER** RDKIT and numpy are dependencies that the user must manage themselves:
+`pip install git+https://github.com/neal-p/workflowV2.git`
+
+To use any calculators and actually compute anything, you will need to provide the paths to the executables in the `config.py` file and may need to change the default slurm parameters. 
+For exmple, for Discovery users at Northeastern the G16 root is set to `g16root = '/work/lopez/'`, which points to our installation of Gaussian16.
+Similarly, to run CREST, `crest_exe = '/work/lopez/xtb/crest'` and `xtb_exe = '/work/lopez/xtb/xtb_6.2.3/bin/xtb'` are specified. 
+
+Additional global configuration variables are also accessible here. For example, the default Slurm partition is set `default_partition = 'short,lopez'`
+
+# Creating and using Mol Objects
+
+# Creating and using Calculators
