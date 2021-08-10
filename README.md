@@ -65,7 +65,7 @@ Similarly, to run CREST, `crest_exe = '/work/lopez/xtb/crest'` and `xtb_exe = '/
 Additional global configuration variables are also accessible here. For example, the default Slurm partition is set `default_partition = 'short,lopez'`
 
 # Updating
-Updates can be pulled with the following
+Updates can be pulled with the following:\
 ` pip  install --upgrade git+https://github.com/neal-p/workflowV2.git`
 
 # Creating and using Mol Objects
