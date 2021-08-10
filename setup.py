@@ -8,7 +8,10 @@ from setuptools import setup,find_packages
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
+def checkdependencies(
+
 setup(
+    cmdclass={'check_dependencies':checkdependencies}
     name = "workflowV2",
     version = "2.0",
     author = "Patrick Neal",
@@ -19,13 +22,4 @@ setup(
     long_description=read('README'),
 )
 
-try:
-    import rdkit
-except:
-    print(' - WARNING - \n\nworkflowV2 uses RDkit!\nRDkit was not found in this environment, please install before using workflowV2\n\n')
-    
-try:
-    import numpy
-except:
-    print(' - WARNING - \n\nworkflowV2 uses numpy!\nnumpy was not found in this environment, please install before using workflowV2\n\n')
-    
+
