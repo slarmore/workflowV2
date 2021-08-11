@@ -78,28 +78,27 @@ from workflowV2 import molecule
 mol = molecule.SmilesToMol('C1=CC=CC=C1')
 ```
 
-`mol.atoms` - np.array of atomic symbols\
-`mol.coords` - np.array of x y z coordinates\
-`mol.conformers` - List of Conformer Objects (a lighter-weight Mol object)
-`mol.energy` - molecule energy
-`mol.constraints` - list of lists containing constraints: \
-[[1],[1,2],[1,2,3],[1,2,3,4]] will constain atom1, the distance between atom1-atom2, the angle atom1-atom2-atom3, and the dihedral atom1-atom2-atom3-atom4\
-`mol.tags` - A dictionary of tags for a molecule. This can be helpful for checkpointing long workflows with `mol.tags['step'] = 3` or adding information like `mol.tags['global_min'] = True`
-`mol.warnings` - 
-`mol.charge` - 
-`mol.mult` - 
-`mol.properties` - 
-`mol.natoms` - 
-`mol.smiles` - 
-`mol.rdkitmol` - 
-`mol.xyz` - 
-`mol.xyzstring` - 
-`mol.ToXYZ(outfile=None,title=None,write=True)` - 
-`mol.ConformersToXYZ(outfile,start=0,stop=None)` - 
-`mol.checkpoint(outfile)` - 
-`mol.copy()` - 
-`mol.RefineConformers(calculator_class,jobname,tries=1,**kwargs)` - 
-`mol.generate_rdkit_conformers(nconfs=5,tags={})` - 
+  - `mol.atoms` - np.array of atomic symbols
+  - `mol.coords` - np.array of x y z coordinates
+  - `mol.conformers` - List of Conformer Objects (a lighter-weight Mol object)
+  - `mol.energy` - molecule energy
+  - `mol.constraints` - list of lists containing constraints: [[1],[1,2],[1,2,3],[1,2,3,4]] will constain atom1, the distance between atom1-atom2, the angle atom1-atom2-atom3, and the dihedral atom1-atom2-atom3-atom4 
+  - `mol.tags` - A dictionary of tags for a molecule. This can be helpful for checkpointing long workflows with `mol.tags['step'] = 3` or adding information like `mol.tags['global_min'] = True`
+  - `mol.warnings` - 
+  - `mol.charge` - 
+  - `mol.mult` - 
+  - `mol.properties` - 
+  - `mol.natoms` - 
+  - `mol.smiles` - 
+  - `mol.rdkitmol` - 
+  - `mol.xyz` - 
+  - `mol.xyzstring` - 
+  - `mol.ToXYZ(outfile=None,title=None,write=True)` - 
+  - `mol.ConformersToXYZ(outfile,start=0,stop=None)` - 
+  - `mol.checkpoint(outfile)` - 
+  - `mol.copy()` - 
+  - `mol.RefineConformers(calculator_class,jobname,tries=1,**kwargs)` - 
+  - `mol.generate_rdkit_conformers(nconfs=5,tags={})` - 
 
 
 
