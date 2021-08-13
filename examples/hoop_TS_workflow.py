@@ -256,7 +256,8 @@ if mol.tags['step'] < 5:
                    jobname='{0}-IRC-forward'.format(input_name),
                    method=dftmethod,
                    scrf='iefpcm,solvent={0}'.format(solvent_dict['gaussian']),
-                   irc='forward,calcfc',
+                   irc='forward,rcfc',
+                   oldchk=mol.tags['chk'],
                    nproc=nproc,
                    mem=mem,
                    time=time)
@@ -286,7 +287,8 @@ if mol.tags['step'] < 6:
                    jobname='{0}-IRC-reverse'.format(input_name),
                    method=dftmethod,
                    scrf='iefpcm,solvent={0}'.format(solvent_dict['gaussian']),
-                   irc='reverse,calcfc',
+                   irc='reverse,rcfc',
+                   oldchk=mol.tags['chk'],
                    nproc=nproc,
                    mem=mem,
                    time=time)

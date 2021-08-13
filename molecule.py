@@ -9,7 +9,6 @@ from . import calculator
 from .utils import hartree2kcal
 import itertools
 from .message import warning,log,display
-from .config import max_conformers
 import pickle
 
 #######################################################################################################
@@ -113,7 +112,7 @@ class Mol(FrozenClass):
 
     @atoms.setter
     def atoms(self,new_atoms):
-        self._atoms = new_atoms
+        self._atoms = np.array(new_atoms)
         self._natoms = len(new_atoms)
         if self._coords:
             self.update_geometry()
@@ -466,9 +465,9 @@ def SmilesToMol(smiles,
             constraints=[],
             seed=0):
     '''Wrapper for taking in a smiles and using RDKIT to generate conformers and energies'''
-   
-    if nconfs > max_conformers:
-        raise ValueError('The max_conformers is set to {0}'.format(max_conformers))
+
+    if nconfs < 1:
+        raise IndexError('Must generate at least 1 conformer')
 
     rdkitmol = Chem.MolFromSmiles(smiles)
     rdkitmol = AllChem.AddHs(rdkitmol,addCoords=True)
