@@ -51,13 +51,13 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time=default_time,partitio
         constraint_string = []
         for constraint in mol.constraints:
             if len(constraint) == 1:
-                constraint_string.append('X {0} F'.format(constraint))
+                constraint_string.append('X {0} F'.format(constraint[0]+1))
             elif len(constraint) == 2:
-                constraint_string.append('B {0} {1} F'.format(constraint[0],constraint[1]))
+                constraint_string.append('B {0} {1} F'.format(constraint[0]+1,constraint[1]+1))
             elif len(constraint) == 3:
-                constraint_string.append('A {0} {1} {2} F'.format(constraint[0],constraint[1],constraint[2]))
+                constraint_string.append('A {0} {1} {2} F'.format(constraint[0]+1,constraint[1]+1,constraint[2]+1))
             elif len(constraint) == 4:
-                constraint_string.append('D {0} {1} {2} {3} F'.format(constraint[0],constraint[1],constraint[2],constraint[3])) 
+                constraint_string.append('D {0} {1} {2} {3} F'.format(constraint[0]+1,constraint[1]+1,constraint[2]+1,constraint[3]+1)) 
 
         constraint_string = '\n'.join(constraint_string)
 
@@ -438,11 +438,9 @@ def orbital_energies(mol,line_number,line,output_lines,calculator):
         for orbital in homo_line:
             #if there wasn't a space between the
             if orbital.count('-') > 1:
-                print('split apart energy {0}'.format(orbital))
                 splitapart = orbital.split('-')[1:]
                 #add back the negative sign
                 splitapart = ['-{0}'.format(energy) for energy in splitapart]
-                display(splitapart)
                 clean_list.extend(splitapart)
             else:
                 clean_list.append(orbital)
@@ -457,13 +455,10 @@ def orbital_energies(mol,line_number,line,output_lines,calculator):
             newline = newline.split()[4:]
             clean_list = []
             for orbital in newline:
-                display(orbital)
                 if orbital.count('-') > 1:
-                    display('was split')
                     splitapart = orbital.split('-')[1:]
                     #add back the negative sign
                     splitapart = ['-{0}'.format(energy) for energy in splitapart]
-                    display(splitapart)
                     clean_list.extend(splitapart)
                 else:
                     clean_list.append(orbital)
