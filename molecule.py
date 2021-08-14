@@ -150,6 +150,7 @@ class Mol(FrozenClass):
             out.append(str(self.energy))
 
         out.append(self.xyzstring)
+        out.append('\n')
 
         #write to file if requrested, otherwise return string
         if write:
