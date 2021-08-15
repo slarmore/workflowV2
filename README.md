@@ -173,3 +173,44 @@ mol = molecule.XYZToMol('benzene.xyz')
 ```
 
 # Creating and using Calculators
+The `calculator` module has the functions for interacting with Calculator Objects that are created by the program-specific files in `workflowV2.software.XXX`
+
+The process of running calculations has two steps: creating the calculator and submitting the calculator
+
+**Creating the calculator** \
+A Calculator Object is created to run a specific program. Each supported program has a file in the workflowV2/software/ directory and the function to create a Calculator Object is all-caps the name of the program. For example, to set up a Gaussian calculator you need to: 
+  1. import the GAUSSIAN function from workflowV2.software.GAUSSIAN
+  2. call the GAUSSIAN function with the proper arguments to set up the desired calculation
+
+```
+from workflowV2.software.GAUSSIAN import GAUSSIAN
+calc = GAUSSIAN(mol,jobname='benzene_opt',runtype='opt_freq',method='HF/6-31G')
+```
+**Submitting the calculator** \
+The submission process is handled by the funcitons in the `calculator` module. There are two ways of submitting:
+  - `calculator.Run` - submit a single calculator 
+  - `calculator.Runbatch` - submits a list of calculators in parallel with a Slurm array
+
+Both methods return updated Mol Objects from the calculation. The `Run` funtion returns a single Mol Object back, the `RunBatch` function returns the list of updated Mol Objects.
+
+`calculator.Run` arguments:
+  - `calculator` - the calculator object to submit the job with
+  - `tries=1` - the number of resubmissions if the job fails (this is only supported for programs where the `fix_errors` method is implemented)
+  - `ignore=False` - ignore calculation errors on the final resubmission try. When False, if the calculation fails after all of the tries are used up, it will return the updated Mol Object with whatever information could be parsed. For example, even if a structure did not finish optimizing, it will return the latest geometry. When False, if the final try fails an IndexError (`Ran out of resubmission tries`) will be raised.
+
+
+`calculator.RunBatch` arguments:
+  - `calculators` - a list of calculator objects to submit the job with
+  - `jobname='batch_job'` - Name of the Slurm array job to submit
+  - `max=50` - number of concurrent array jobs to run
+  - `tries=1` - the number of resubmissions if the job fails (this is only supported for programs where the `fix_errors` method is implemented)
+  - `ignore=False` - ignore calculation errors on the final resubmission try. When False, if the calculation fails after all of the tries are used up, it will return the updated Mol Object with whatever information could be parsed. For example, even if a structure did not finish optimizing, it will return the latest geometry. When False, if the final try fails an IndexError (`Ran out of resubmission tries`) will be raised.
+
+# utils functions
+I have built a few utility functions that I've found helpful along the way in `workflowV2.utils` that include things for parallel computing, atom distances, etc. Hopefully these will be encorporated more smoothly into the rest of the code as it evolves!
+
+# Example workflows
+There are a few workflow exmaples of varrying complexity in the `examples` directory
+
+# Reporting bugs and requests
+Please report any bugs or feature requests! This hopefully a growing and expanding code base that will adapt to our needs!
