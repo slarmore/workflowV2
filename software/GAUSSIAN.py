@@ -247,6 +247,7 @@ class gaussian:
                              'Alpha  occ. eigenvalues': orbital_energies,
                              'Thermal correction to Energy': thermal_energies,
                              'Standard orientation': geometry,
+                             'Input orientation': geometry,           #called Input orientation in IRC calcultaions
                              'Non-Optimized Parameters': non_opt,
                              'armonic frequencies': frequencies,       #want to match both Harmonic and Anharmonic
                              'SCF Error SCF Error SCF Error SCF Error': scf_error,
