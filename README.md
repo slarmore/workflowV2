@@ -178,7 +178,9 @@ The `calculator` module has the functions for interacting with Calculator Object
 The process of running calculations has two steps: creating the calculator and submitting the calculator
 
 **Creating the calculator** \
-A Calculator Object is created to run a specific program. Each supported program has a file in the workflowV2/software/ directory and the function to create a Calculator Object is all-caps the name of the program. For example, to set up a Gaussian calculator you need to: 
+A Calculator Object is created to run a specific program. Each supported program has a file in the `workflowV2/software/` directory and the function to create a Calculator Object is all-caps the name of the program. A documentation page for each software is accompanies each module in the `workflowV2/software/` directory
+
+For example, to set up a Gaussian calculator you need to: 
   1. import the GAUSSIAN function from workflowV2.software.GAUSSIAN
   2. call the GAUSSIAN function with the proper arguments to set up the desired calculation
 
