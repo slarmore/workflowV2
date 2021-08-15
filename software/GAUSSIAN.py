@@ -439,9 +439,9 @@ def chk_file(mol,line_number,line,output_lines,calculator):
     chk_file_name = line.split('=')[-1]
 
     #check if it wrapped to the next line
-    while chk_file_name[-4:-1]  != '.chk':
+    while chk_file_name[-4:]  != '.chk':
         line_number += 1
-        chk_file_name += output_lines[line_number]
+        chk_file_name += output_lines[line_number].strip()
         
     mol.tags['chk'] = chk_file_name
 
