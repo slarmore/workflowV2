@@ -64,7 +64,7 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time=default_time,partitio
         if runtype in ['opt','opt_freq']:
             if 'opt' in kwargs:
                 current = kwargs['opt']
-                if not re.search('modredundant',current):
+                if not re.search('modredundant',current,re.IGNORECASE):
                     kwargs['opt'] = current + ' modredundant'
             else:
                 kwargs['opt'] = 'modredundant'
@@ -143,9 +143,9 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time=default_time,partitio
         com.append('--Link1--')
 
         #add geom=check guess=read if not already present in the original route
-        if not re.search('geom=\(check\)',route):
+        if not re.search('geom=\(check\)',route,re.IGNORECASE):
             route += ' geom=(check)'
-        if not re.search('guess=\(read\)',route):
+        if not re.search('guess=\(read\)',route,re.IGNORECASE):
             route += ' guess=(read)'
 
         com.extend(['%chk={0}.chk'.format(basename_full),
@@ -312,21 +312,35 @@ class gaussian:
         #not very elegant, but loop through the list and 
         #add keywords to fix any known errors
 
+        #IRC is special case, probably don't want to start at the end point
+        if kwargs['runtype'] ==  'irc':
+            if 'irc' in kwargs:
+                current = kwargs['irc']
+                if not re.search('recalc',current,re.IGNORECASE):
+                    kwargs['irc'] = current + ',recalc=5'
+                current = kwargs['irc']
+                if not re.search('stepsize',current,re.IGNORECASE):
+                    kwargs['irc'] = current + ',stepsize=5'
+            else:
+                kwargs['irc'] = 'recalc=5,stepsize=5'
+            return(kwargs)
+
+        
         if 'out_of_optimization_steps' in mol.warnings:
             #if the opt keyword was specified
             if 'opt' in kwargs:
                 current = kwargs['opt']
                 #add maxstep if not present
-                if not re.search('maxstep',current):
+                if not re.search('maxstep',current,re.IGNORECASE):
                     kwargs['opt'] = current + ',maxstep=10'
                 #if has calcall, ignore
-                if re.search('calcall',current):
+                if re.search('calcall',current,re.IGNORECASE):
                     pass
                 #if already has recalcfc, ignore
-                elif re.search('recalcfc',current):
+                elif re.search('recalcfc',current,re.IGNORECASE):
                     pass
                 #if has just calcfc, then replace with recalcfc
-                elif re.search('calcfc',current):
+                elif re.search('calcfc',current,re.IGNORECASE):
                     kwargs['opt'] = current.replace('calcfc','recalcfc=10')
                 else:
                     kwargs['opt'] =  current + ',recalcfc=10'
@@ -344,7 +358,7 @@ class gaussian:
         if 'SCF_Error' in mol.warnings:
             if 'scf' in kwargs:
                 current = kwargs['scf']
-                if not re.search('qc'):
+                if not re.search('qc',current,re.IGNORECASE):
                     kwargs['scf'] = current + ',qc'
             else:
                 kwargs['scf'] = 'qc'
@@ -373,13 +387,13 @@ def add_or_read_fc(mol,input_name,kwargs):
         #if the opt keyword was specified
         if 'opt' in kwargs:
             current = kwargs['opt']
-            if re.search('calcall',current):
+            if re.search('calcall',current,re.IGNORECASE):
                 pass
             #if its recalcfc, add readfc so the first is read
-            elif re.search('recalcfc',current):
+            elif re.search('recalcfc',current,re.IGNORECASE):
                 kwargs['opt'] = current + ',readfc'
             #if it's just calcfc, then read in the fc, replacing calcfc
-            elif re.search('calcfc',current):
+            elif re.search('calcfc',current,re.IGNORECASE):
                 kwargs['opt'] = current.replace('calcfc','readfc')
             else:
                 kwargs['opt'] = current + ',readfc'
@@ -391,11 +405,11 @@ def add_or_read_fc(mol,input_name,kwargs):
         #if the opt keyword is specified
         if 'opt' in kwargs:
             current = kwargs['opt']
-            if re.search('calcall',current):
+            if re.search('calcall',current,re.IGNORECASE):
                 pass
-            elif re.search('recalcfc',current):
+            elif re.search('recalcfc',current,re.IGNORECASE):
                 pass
-            elif re.search('calcfc',current):
+            elif re.search('calcfc',current,re.IGNORECASE):
                 pass
             else:
                 kwargs['opt'] = current + ',calcfc'
