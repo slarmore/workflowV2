@@ -1,6 +1,7 @@
 import sys
 import os
 from . import __logging__,__logfile__
+from datetime import datetime
 
 global __logging__
 global __logfile__
@@ -23,13 +24,16 @@ def logtofile(file):
     else:
         __logfile__ = os.path.abspath(file)
 
-def warning(string):
+def warning(string,time=True):
     global __logging__
     global __logfile__
 
     if __logging__:
 
-        prefix = 'WORKFLOW WARNING:\n    '
+        if time:
+            prefix = 'WORKFLOW WARNING:\n{0}\n    '.format(datetime.now())
+        else:
+            prefix = 'WORKFLOW WARNING:\n   '
         appendix = '\n\n'
         string = prefix + string + appendix
 
@@ -40,14 +44,17 @@ def warning(string):
             with open(__logfile__,'a') as log:
                 log.write(string)
 
-def log(string):
+def log(string,time=True):
     global __logging__
     global __logfile__
 
     if __logging__:
 
         prefix = ''
-        appendix = '\n'
+        if time:
+            appendix = ' - {0}\n'.format(datetime.now())
+        else:
+            appendix = '\n'
         string = prefix + string + appendix
 
         if __logfile__ is None:
