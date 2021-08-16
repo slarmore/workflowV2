@@ -47,7 +47,7 @@ Most Crest keywords for the command line are availible for use [Crest manual](ht
 ### Misc. Arguments
 There are a few arguments that fall outside of any of the above categories the user should still be aware of:\
 `delete` - This argument takes a list and should specify globbed matches for files to be deleted. \
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; For example, the default is `delete=['Gau*']` which will delete the Gau-#####.* intermediate files if present. \
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; For example, the default is `delete=['METADYN*','MRMSD','NORMMD*','*.tmp','wbo']` which will delete the METADYN, MRMSD, NORMMD, .tmp and wbo files/directories if present. \
 `max_confs` - This argument requests that the workflow code only parses the first `max_confs` conformers, whether or not CREST has generated more than what is specified.\
 `try_count` - This argument should very rarely be set by the user. \
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; It is for internally keeping track of how many times a job has been resubmitted by the failure handler and there are no existing use cases for the user themselves to specify it directly. 
