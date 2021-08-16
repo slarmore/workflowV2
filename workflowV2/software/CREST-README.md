@@ -35,7 +35,7 @@ Most Crest keywords for the command line are availible for use [Crest manual](ht
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `calc = CREST(mol,runtype='confsearch',gbsa='water')`\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; where the `keyword = 'some option'` is added to the command line as `keyword=some option`
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Similarly, we could modify the `ewin` energy window and run in Crest's `nci` mode with:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Similarly, we could modify the `ewin` energy window and run in Crest's `nci` mode with:\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `calc = CREST(mol,runtype='confsearch',gbsa='water',ewin=500,nci=True)`\
 
 
