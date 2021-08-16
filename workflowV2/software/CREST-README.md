@@ -8,8 +8,8 @@ from workflowV2.software.CREST import CREST
 from workflowV2 import molecule
 from workflowV2.calculator import Run
 
-mol = molecule.SmilesToMol('C1=CC=CC=C1')
-calc = CREST(mol,jobname='benzene_confsearch',runtype='confsearch') 
+mol = molecule.SmilesToMol('CCCCCCCCCC')
+calc = CREST(mol,jobname='confsearch',runtype='confsearch') 
 result = Run(calc)
 ```
 
@@ -28,7 +28,7 @@ result = Run(calc)
 `partition` - partition for the job
 
 ### Calculation specifications
-Most Crest keywords for the route line are availible for use [Crest manual](https://xtb-docs.readthedocs.io/en/latest/crest.html)
+Most Crest keywords for the command line are availible for use [Crest manual](https://xtb-docs.readthedocs.io/en/latest/crest.html)
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **General formatting** \
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Command line options can be specified like:\
@@ -42,12 +42,7 @@ Most Crest keywords for the route line are availible for use [Crest manual](http
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Dealing with Constraints** \
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If the input Mol object has constraints defined in the `.constraints` attribute, \
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the CREST calculator will automatically write a .c constraint file and use `-cinp` on the command line to  \
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; apply the appropriate atom constraints. \
-&nbsp; \
-&nbsp; \
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Reading from chk** \
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Additionally, keywords for reading from chk files are allowed, but the `oldchk` should be specified \
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `calc = GAUSSIAN(mol,runtype='opt_freq',method='HF/6-31G',oldchk='/home/benzene.chk',geom='check',guess='read')` \
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; apply the appropriate atom constraints. 
 
 ### Misc. Arguments
 There are a few arguments that fall outside of any of the above categories the user should still be aware of:\
