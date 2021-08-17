@@ -374,8 +374,8 @@ class gaussian:
             kwargs = add_or_read_fc(mol,input_name,kwargs)
             log('Fixed saddle_point')
             
-        #check if there is a geometry parsed before taking a non-existant structure
-        if 'optimization_xyzs' in mol.properties:
+        #check if there is a SCF converged before taking a non-existant guess
+        if 'electronic_energy' in mol.properties:
             #read in the geometry, guess, and set the oldchk
             kwargs['geom'] = 'check'
             kwargs['guess'] = 'read'
