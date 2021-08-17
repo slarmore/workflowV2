@@ -374,10 +374,12 @@ class gaussian:
             kwargs = add_or_read_fc(mol,input_name,kwargs)
             log('Fixed saddle_point')
             
-        #read in the geometry, guess, and set the oldchk
-        kwargs['geom'] = 'check'
-        kwargs['guess'] = 'read'
-        kwargs['oldchk'] = '{0}.chk'.format(input_name)
+        #check if there is a geometry parsed before taking a non-existant structure
+        if 'optimization_xyzs' in mol.properties:
+            #read in the geometry, guess, and set the oldchk
+            kwargs['geom'] = 'check'
+            kwargs['guess'] = 'read'
+            kwargs['oldchk'] = '{0}.chk'.format(input_name)
 
         return(kwargs)
 
