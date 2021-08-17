@@ -31,7 +31,7 @@ def main(smiles,charge=0,multiplicity=1):
     
     #write the energy
     with open('energy.txt','w') as energyfile:
-        energyfile.write('The electronic energy is {0}'.format(result.energy))
+        energyfile.write('The electronic energy is {0}\n'.format(result.energy))
         
     
 if __name__ == '__main__':
