@@ -574,8 +574,8 @@ if __name__ == '__main__':
     parser.add_argument('-i','--input',type=str,dest='input_file')
     parser.add_argument('-q','--charge',type=int,dest='charge',default=0)
     parser.add_argument('-m','--multiplicity',type=int,dest='multiplicity',default=1)
-    parser.add_argument('--bond1',nags=2,type=int)
-    parser.add_argument('--bond1',nags=2,type=int)
+    parser.add_argument('--bond1',nargs=2,type=int)
+    parser.add_argument('--bond1',nargs=2,type=int)
     arguments = parser.parse_args()
 
     main(arguments.input_file,
