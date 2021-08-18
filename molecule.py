@@ -215,7 +215,7 @@ class Mol(FrozenClass):
 
 #######################
 #convinience functions#
-    def RefineConformers(self,calculator_class,jobname,tries=1,**kwargs):
+    def RefineConformers(self,calculator_class,jobname,tries=1,ignore=False,**kwargs):
         '''take in a generic calculator to apply to each conformer
         then re-rank the conformers with relative energies'''
 
@@ -234,7 +234,7 @@ class Mol(FrozenClass):
             calculators.append(calculator_class(conf,jobname=jobname+'-{0}'.format(index),**local_kwargs))
 
 
-        conformers = calculator.RunBatch(calculators,jobname,tries=tries)
+        conformers = calculator.RunBatch(calculators,jobname,tries=tries,ignore=ignore)
         conformers.sort(key=lambda x: x.energy)
         energies = np.array([conf.energy for conf in conformers])
         energies = energies - energies[0]
