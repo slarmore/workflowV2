@@ -174,7 +174,7 @@ def RunBatch(calculators,jobname='batch_job',max=50,tries=1,ignore=False):
                 sbatch.write(generic_batch(jobname,calculators,max,need_resub,try_count))
 
             for index in need_resub:
-                command_file_name = '{0}/{0}-{1}-try{2}.sh'.format(jobname,index+1,try_count)   #slurm array index start at 1 not 0
+                command_file_name = '{0}/{0}-{1}-try{2}.sh'.format(jobname,index,try_count)
                 with open(command_file_name,'w') as command_file:
                     command_file.write(generic_command(calculators[index]))
         
@@ -189,7 +189,7 @@ def RunBatch(calculators,jobname='batch_job',max=50,tries=1,ignore=False):
             #gather the output and account for failures
             new_need_resub = []
             for index in need_resub:
-                slurmoutput = '{0}/{0}-{1}_{2}.out'.format(jobname,slurmID,index+1) 
+                slurmoutput = '{0}/{0}-{1}_{2}.out'.format(jobname,slurmID,index) 
                 calculators[index].mol = calculators[index].program.read_output(calculators[index],slurmoutput)
                 output[index] = calculators[index].mol
 
@@ -248,7 +248,7 @@ def generic_batch(jobname,calculators,max,need_resub,try_count):
 #SBATCH --ntasks={3}
 #SBATCH --nodes=1
 #SBATCH --time={4}
-#SBATCH --array=1-{5}%{6}
+#SBATCH --array={5}%{6}
 
 #keep each calculator command in a separate script that get's called
 #based on the array task id
@@ -256,7 +256,7 @@ chmod 777 {0}-${{SLURM_ARRAY_TASK_ID}}-try{7}.sh
 
 ./{0}-${{SLURM_ARRAY_TASK_ID}}-try{7}.sh
 
-""".format(jobname,partition,mem,nproc,time,len(need_resub),max,try_count)
+""".format(jobname,partition,mem,nproc,time,','.join(need_resub),max,try_count)
     return(generic_batch_string)
 
 def generic_command(calculator):
