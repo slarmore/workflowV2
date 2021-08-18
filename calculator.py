@@ -160,19 +160,21 @@ def RunBatch(calculators,jobname='batch_job',max=50,tries=1,ignore=False):
     #these are the indicies of the calculators that need to be submitted
     need_resub = list(range(0,len(calculators)))
 
+    try_count = 0
+
 ##############################################
 #start submissions while warnings are present#
     #while there are jobs with warnings, keep resubmitting
     while len(need_resub) > 0:
 
         #unless the number of tries is up (just need to check the first calculator in the list that needs computing)
-        if calculators[need_resub[0]].try_count <= tries:
+        if try_count < tries:
 
             with open(jobname + '/' + jobname+ '.sbatch','w') as sbatch:
-                sbatch.write(generic_batch(jobname,calculators,max,need_resub,calculators[0].try_count))
+                sbatch.write(generic_batch(jobname,calculators,max,need_resub,try_count))
 
             for index in need_resub:
-                command_file_name = '{0}/{0}-{1}-try{2}.sh'.format(jobname,index+1,calculators[index].try_count)   #slurm array index start at 1 not 0
+                command_file_name = '{0}/{0}-{1}-try{2}.sh'.format(jobname,index+1,try_count)   #slurm array index start at 1 not 0
                 with open(command_file_name,'w') as command_file:
                     command_file.write(generic_command(calculators[index]))
         
@@ -198,6 +200,7 @@ def RunBatch(calculators,jobname='batch_job',max=50,tries=1,ignore=False):
                     calculators[index] = calculators[index].resubmit()
 
             need_resub = new_need_resub
+            try_count += 1
 
         else:
             if ignore:
