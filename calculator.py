@@ -239,6 +239,8 @@ def generic_batch(jobname,calculators,max,need_resub,try_count):
     nproc = calculators[0].nproc
     time = calculators[0].time
 
+    need_resub = [str(index) for index in need_resub]
+ 
     generic_batch_string = r"""#!/bin/bash
 #SBATCH --wait  #wait until the job finishes to release the shell - this will allow python to wait for the calculation end
 #SBATCH --job-name={0}
