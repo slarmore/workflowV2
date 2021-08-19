@@ -536,6 +536,7 @@ def thermal_energies(mol,line_number,line,output_lines,calculator):
     #assume that the free energy is always the best to use
     mol.energy = free_energy
 
+
 def geometry(mol,line_number,line,output_lines,calculator):
     global step
     step += 1
@@ -696,4 +697,3 @@ def steps_exceeded(mol,line_number,line,output_lines,calculator):
     '''.format(calculator.jobname))
 
     mol.warnings.append('out_of_optimization_steps')
-

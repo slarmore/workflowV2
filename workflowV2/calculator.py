@@ -214,7 +214,6 @@ def RunBatch(calculators,jobname='batch_job',max=50,tries=1,ignore=False):
 
 #############################################################################################################################
 #submission templates
-
 def generic_single(calculator):
     generic_single_string = r"""#!/bin/bash
 #SBATCH --wait  #wait until the job finishes to release the shell - this will allow python to wait for the calculation end

@@ -514,5 +514,3 @@ def ReadCheckpoint(infile):
     with open(infile,'rb') as chk:
         return(pickle.load(chk))
 
-
-

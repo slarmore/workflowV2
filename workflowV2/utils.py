@@ -9,6 +9,7 @@ import datetime
 from . import molecule
 import numpy as np
 
+
 atomic_number2symbol = {
     1:'H',
     6:'C',
@@ -99,6 +100,4 @@ def atom_distance(mol1,atom1,mol2,atom2):
     atom2_x,atom2_y,atom2_z = mol2.coords[atom2]
 
     return(  np.sqrt(   ((atom1_x - atom2_x)**2 + (atom1_y - atom2_y)**2  + (atom1_z - atom2_z)**2 )   )  )
-
-
 

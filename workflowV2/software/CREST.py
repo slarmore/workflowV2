@@ -6,6 +6,7 @@ from shutil import Error
 from .. import calculator
 from .. import molecule
 from ..config import * #this is where the exe should be defined
+
 import re
 import numpy as np
 from ..utils import cleaner
@@ -132,6 +133,7 @@ def CREST(mol,jobname,runtype,nproc=1,mem=1,time=default_time,partition=default_
 
 ########################
 #define the run command#
+
     #combine all of the parsed route line arguments
     arguments = ' '.join(arguments)
 
