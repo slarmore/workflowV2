@@ -9,9 +9,26 @@ from . import calculator
 from .utils import hartree2kcal
 import itertools
 from .message import warning,log,display
-from .config import max_conformers
+import pickle
 
-class Mol:
+#######################################################################################################
+#class for freezing the attributes of mol and conformer objects
+class FrozenClass(object):
+    __isfrozen = False
+    def __setattr__(self, key, value):
+        if self.__isfrozen and key not in dir(self):
+            raise TypeError( "Cannot add attribute to {0}, use .tags dict to store misc. information".format(self))
+        object.__setattr__(self, key, value)
+
+    def _freeze(self):
+        self.__isfrozen = True
+
+
+
+#######################################################################################################
+#Mol object
+
+class Mol(FrozenClass):
     '''Main molecule class'''
     def __init__(self,
                 atoms,
@@ -21,48 +38,59 @@ class Mol:
                 energy=None,
                 constraints=[],
                 tags={},
-                xyz=None,
                 charge=0,
                 mult=1,
                 properties={}, 
-                calc=None,
                 warnings=[]): 
 
-        #core properties
-        self.smiles = smiles
+
+    #######################
+    #check for valid input#
+        if len(atoms) != len(coords):
+            raise IndexError('Length of atoms is {0}, length of coords is {1}'.format(len(atoms),len(coords)))
+
+    #################
+    #core attributes#
+        self._coords = False
+        self._atoms = atoms
         self.coords = coords
         self.conformers = conformers
         self.energy = energy
         self.constraints = constraints
         self.tags = tags
         self.warnings = warnings
-        self.atoms = atoms
         self.charge = charge
         self.mult = mult
         self.properties = properties
-        self.calc = calc
-        self.natoms = len(self.atoms)
+        self._natoms = len(self.atoms)
+        self.smiles = smiles
 
-        #get the derived properties
-        if xyz is None:
-            self.get_xyz()
-        else:
-            self.xyz = xyz
 
+    ####################
+    #derived attributes#
         self.get_rdkitmol()
-        self.get_xyzstring()
-        
 
-    #derived property methods
+
+        #don't allow any new attribute to be defined
+        self._freeze()
+
     def get_xyz(self):
+        if len(self.atoms) != len(self.coords):
+            raise IndexError('Length of atoms is {0}, length of coords is {1}'.format(len(self.atoms),len(self.coords)))
+
         xyz = []
+
         for index,atom in enumerate(self.atoms):
-            xyz.append([atom,self.coords[index][0],self.coords[index][1],self.coords[index][2]])
+            #need to prevent writing out scientific notation by specifying number of decimals
+            xyz.append([atom,'{:.7f}'.format(self.coords[index][0]),'{:.7f}'.format(self.coords[index][1]),'{:.7f}'.format(self.coords[index][2])])
         self.xyz = np.array(xyz)
 
     def get_rdkitmol(self):
         if self.smiles is not None:
-            self.rdkitmol = Chem.MolFromSmiles(self.smiles)
+            try:
+                self.rdkitmol = Chem.MolFromSmiles(self.smiles)
+            except:
+                warning('Could not generate RDkit mol from {0}'.format(self.smiles))
         else:
             self.rdkitmol = None
         
@@ -72,15 +100,44 @@ class Mol:
             xyzstring.append('      '.join(line))
         self.xyzstring = '\n'.join(xyzstring)
 
-    #Mol object methods
-
     def update_geometry(self):
         self.get_xyz()
         self.get_xyzstring()
 
+    #restrict access to some Mol properties that user
+    #shouldn't touch, or ensure updates to the rest of the info
+    @property
+    def atoms(self):
+        return(self._atoms)
 
-    #File IO functions
-    def ToXYZ(self,outfile=None,title=None,coords=None,write=True):
+    @atoms.setter
+    def atoms(self,new_atoms):
+        self._atoms = np.array(new_atoms)
+        self._natoms = len(new_atoms)
+        if self._coords:
+            self.update_geometry()
+            self._coords = True
+
+    @property
+    def coords(self):
+        return(self._coords)
+
+    @coords.setter
+    def coords(self,new_coords):
+        if len(new_coords) != len(self.atoms):
+            raise IndexError('Length of atoms is {0}, length of coords is {1}'.format(len(self.atoms),len(self.coords)))
+
+        #make a numpy array of float points for consistency
+        self._coords = np.array(new_coords,dtype=np.float64)
+        self.update_geometry()
+
+    @property
+    def natoms(self):
+        return(self._natoms)
+
+###################
+#File IO functions#
+    def ToXYZ(self,outfile=None,title=None,write=True):
         #number of atoms
         out = [str(self.natoms)]
 
@@ -92,19 +149,14 @@ class Mol:
         else:
             out.append(str(self.energy))
 
-        #pair the atom with the coordinates
-        if coords is None:
-            coords = self.coords
-        for atom,line in zip(self.atoms,list(coords)):
-            line = [str(coord) for coord in line]
-            line.insert(0,atom)
-            out.append('      '.join(line))
+        out.append(self.xyzstring)
+        out.append('\n')
 
         #write to file if requrested, otherwise return string
         if write:
             if outfile is None:
-                raise TypeError('outfile argument cannot be None')
-
+                raise TypeError('outfile must not be None if write is True')
+                
             with open(outfile,'w') as xyzout:
                 xyzout.write('\n'.join(out))
         else:
@@ -127,13 +179,20 @@ class Mol:
                     out_sub.append('      '.join(line))
                 out.append('\n'.join(out_sub))
 
+                out.append('\n')
+
             with open(outfile,'w') as xyzout:
                 xyzout.write('\n'.join(out))
             
         else:
             raise IndexError('No conformers present')
 
-    
+    def checkpoint(self,outfile):
+        with open(outfile,'wb') as chk:
+            pickle.dump(self,chk)
+
+###########################################################################
+#copy method to prevent changing original object with updated calculations#
     def __deepcopy__(self,memo):
         id_self = id(self)        # memoization avoids unnecesary recursion
         _copy = memo.get(id_self)
@@ -145,25 +204,37 @@ class Mol:
                 energy=deepcopy(self.energy),
                 constraints=deepcopy(self.constraints),
                 tags=deepcopy(self.tags),
-                xyz=deepcopy(self.xyz),
                 charge=deepcopy(self.charge),
                 mult=deepcopy(self.mult),
                 properties=deepcopy(self.properties), 
-                calc=deepcopy(self.calc),
                 warnings=deepcopy(self.warnings))
         return(_copy)
 
     def copy(self):
         return(deepcopy(self))
 
-    def RefineConformers(self,calculator_class,jobname,**kwargs):
+#######################
+#convinience functions#
+    def RefineConformers(self,calculator_class,jobname,tries=1,ignore=False,**kwargs):
         '''take in a generic calculator to apply to each conformer
         then re-rank the conformers with relative energies'''
 
         #take the generic calculator and apply it to each conformre
-        calculators = [calculator_class(conf,jobname=jobname+'{0}'.format(index+1),**kwargs) for index,conf in enumerate(self.conformers)]
+        #calculators = [calculator_class(conf,jobname=jobname+'-{0}'.format(index),**kwargs) for index,conf in enumerate(self.conformers)]
         
-        conformers = calculator.RunBatch(calculators,jobname)
+        #look for {conf} in any of the kwarg values and replace with conformer #
+        #this will allow specification of specific oldchk file for each conformer
+        #when restarting a gaussian calculation
+        calculators = []
+        for index,conf in enumerate(self.conformers):
+            local_kwargs = kwargs.copy()
+            for key, value in local_kwargs.items():
+                if  isinstance(value,str):
+                    local_kwargs[key] = value.replace('{conf}',str(index))
+            calculators.append(calculator_class(conf,jobname=jobname+'-{0}'.format(index),**local_kwargs))
+
+
+        conformers = calculator.RunBatch(calculators,jobname,tries=tries,ignore=ignore)
         conformers.sort(key=lambda x: x.energy)
         energies = np.array([conf.energy for conf in conformers])
         energies = energies - energies[0]
@@ -210,48 +281,117 @@ class Mol:
         conformers.sort(key=lambda x: x.energy)
 
 
-class Conformer:
+
+#######################################################################################################
+#Conformer object
+
+class Conformer(FrozenClass):
     '''a container to store conformers - its a lighter weight version of the mol object'''
-    def __init__(self,energy,atoms,coords,xyz=None,tags={},constraints=[],smiles=None,charge=0,mult=1):
-        self.energy = energy
-        self.atoms = atoms
+    def __init__(self,
+                    atoms,
+                    coords,
+                    energy=None,
+                    tags={},
+                    constraints=[],
+                    smiles=None,
+                    charge=0,
+                    mult=1):
+
+        #######################
+        #check for valid input#
+        if len(atoms) != len(coords):
+            raise IndexError('Length of atoms is {0}, length of coords is {1}'.format(len(atoms),len(coords)))
+
+        self._coords = False
+        self._atoms = atoms
         self.coords = coords
-        self.tags = tags
-        self.natoms = len(atoms)
+        self.energy = energy
         self.constraints = constraints
-        self.smiles = smiles
+        self.tags = tags
         self.charge = charge
         self.mult = mult
+        self._natoms = len(self.atoms)
+        self.smiles = smiles
 
-        #construct the xyz if not present
-        if xyz is None:
-            xyz = []
-            for index,atom in enumerate(atoms):
-                xyz.append([atom,coords[index][0],coords[index][1],coords[index][2]])
-            self.xyz = np.array(xyz)
-        else:
-            self.xyz = xyz
+        #don't allow any new attribute to be defined
+        self._freeze()
 
+    def get_xyz(self):
+        if len(self.atoms) != len(self.coords):
+            raise IndexError('Length of atoms is {0}, length of coords is {1}'.format(len(self.atoms),len(self.coords)))
+
+        xyz = []
+
+        for index,atom in enumerate(self.atoms):
+            #need to prevent writing out scientific notation by specifying number of decimals
+            xyz.append([atom,'{:.7f}'.format(self.coords[index][0]),'{:.7f}'.format(self.coords[index][1]),'{:.7f}'.format(self.coords[index][2])])
+        self.xyz = np.array(xyz)
+        
+    def get_xyzstring(self):
         xyzstring=[]
         for line in self.xyz:
             xyzstring.append('      '.join(line))
         self.xyzstring = '\n'.join(xyzstring)
-    
-        #File IO functions
-    def ToXYZ(self,outfile,title=None):
+
+    def update_geometry(self):
+        self.get_xyz()
+        self.get_xyzstring()
+
+    #restrict access to some Conformer properties that user
+    #shouldn't touch, or ensure updates to the rest of the info
+    @property
+    def atoms(self):
+        return(self._atoms)
+
+    @atoms.setter
+    def atoms(self,new_atoms):
+        self._atoms = new_atoms
+        self._natoms = len(new_atoms)
+        self.update_geometry()
+
+    @property
+    def coord(self):
+        return(self.coord)
+
+    @coord.setter
+    def coord(self,new_coords):
+        if len(new_coords) != len(self.atoms):
+            raise IndexError('Length of atoms is {0}, length of coords is {1}'.format(len(self.atoms),len(self.coords)))
+
+        #make a numpy array of float points for consistency
+        self.coords = np.array(new_coords,dtype=np.float64)
+        log(type(self.coords[0][0]))
+        self.update_geometry()
+
+    @property
+    def natoms(self):
+        return(self._natoms)
+
+###################
+#File IO functions#
+    def ToXYZ(self,outfile,title=None,write=True):
+        #number of atoms
         out = [str(self.natoms)]
+
+        #title line
         if title is not None:
             out.append(str(title))
         elif 'title' in self.tags:
-            out.append(str(self.tags['title']))
+            out.append(str(self.tags['title {0}'.format(self.energy)]))
         else:
-            out.append('From Mol object - {0}'.format(self.energy))
-        for line in self.xyz:
-            out.append('      '.join(line))
+            out.append(str(self.energy))
 
-        with open(outfile,'w') as xyzout:
-            xyzout.write('\n'.join(out))
-    
+        out.append(self.xyzstring)
+
+        #write to file if requrested, otherwise return string
+        if write:
+            with open(outfile,'w') as xyzout:
+                xyzout.write('\n'.join(out))
+        else:
+            return('\n'.join(out))
+
+#######################
+#upgrade to mol object#
     def ToMol(self):
         mol = Mol(self.atoms,
                 self.coords,
@@ -260,16 +400,15 @@ class Conformer:
                 energy=self.energy,
                 constraints=self.constraints,
                 tags=self.tags,
-                xyz=self.xyz,
                 charge=self.charge,
                 mult=self.mult,
-                properties={}, 
-                calc=None)
+                properties={})
         return(mol)
+
+
 
 ###########################################################################################################################
 # Type converters
-##########################################################################################################################
 
 def XYZToMol(infile,
             smiles=None,
@@ -313,9 +452,8 @@ def XYZToMol(infile,
 
         #return the mol object
         return(Mol(atoms,coords,smiles=smiles,energy=energy,
-                    constraints=[],tags=tags,
-                    charge=charge,mult=mult,
-                    xyz=xyz))
+                    constraints=constraints,tags=tags,
+                    charge=charge,mult=mult))
     else:
         warning('No such file {0}'.format(infile))
         return(None)
@@ -324,15 +462,17 @@ def SmilesToMol(smiles,
             nconfs=5,
             tags={},
             charge=0,
-            mult=1):
+            mult=1,
+            constraints=[],
+            seed=0):
     '''Wrapper for taking in a smiles and using RDKIT to generate conformers and energies'''
-   
-    if nconfs > max_conformers:
-        raise ValueError('The max_conformers is set to {0}'.format(max_conformers))
+
+    if nconfs < 1:
+        raise IndexError('Must generate at least 1 conformer')
 
     rdkitmol = Chem.MolFromSmiles(smiles)
     rdkitmol = AllChem.AddHs(rdkitmol,addCoords=True)
-    AllChem.EmbedMultipleConfs(rdkitmol,numConfs=nconfs,enforceChirality=True,numThreads=0)
+    AllChem.EmbedMultipleConfs(rdkitmol,numConfs=nconfs,enforceChirality=True,numThreads=0,randomSeed=seed)
     energies = AllChem.UFFOptimizeMoleculeConfs(rdkitmol,numThreads=0)
     energies = [energy[1] for energy in energies]
 
@@ -354,7 +494,7 @@ def SmilesToMol(smiles,
             
             coords.append([x,y,z])
             atoms.append(symbol)
-        conformers.append(Conformer(energy,np.array(atoms),np.array(coords),xyz=None,tags=tags,smiles=smiles,charge=charge,mult=mult))
+        conformers.append(Conformer(energy=energy,atoms=np.array(atoms),coords=np.array(coords),tags=tags,smiles=smiles,charge=charge,mult=mult))
 
     #sort the conformers by energy (first value in the tuple)
     conformers.sort(key=lambda x: x.energy)
@@ -365,12 +505,12 @@ def SmilesToMol(smiles,
     energy = conformers[0].energy
 
     #return the mol object
-    return(Mol(atoms,coords,smiles=smiles,energy=energy,conformers=conformers,
-                    constraints=[],tags=tags,
-                    charge=charge,mult=mult,
-                    xyz=None))
+    return(Mol(atoms=atoms,coords=coords,smiles=smiles,energy=energy,conformers=conformers,
+                    constraints=constraints,tags=tags,
+                    charge=charge,mult=mult))
 
 
-
-
+def ReadCheckpoint(infile):
+    with open(infile,'rb') as chk:
+        return(pickle.load(chk))
 

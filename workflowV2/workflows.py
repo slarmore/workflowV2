@@ -1,9 +1,10 @@
-from workflow import molecule
-from workflow.crest import CREST
-from workflow.gaussian import GAUSSIAN
-from workflow.calculator import Run,RunBatch
 
-from workflow.utils import parallelize
+from . import molecule
+from .software.CREST import CREST
+from .software.GAUSSIAN import GAUSSIAN
+from .calculator import Run,RunBatch
+
+from .utils import parallelize
 import os
 
 
@@ -28,7 +29,7 @@ def get_lowest_conformer(smiles,name=None):
     os.makedirs('conf_search',exist_ok=True)
     os.chdir('conf_search')
 
-    crest_conformer_calculator = CREST(mol,title='{0}-crest'.format(name),runtype='confsearch',nproc=16,mem=120,time='1-00:00:00',partition='short,lopez',gbsa='water',ewin=500)
+    crest_conformer_calculator = CREST(mol,jobname='{0}-crest'.format(name),runtype='confsearch',nproc=16,mem=120,time='1-00:00:00',partition='short,lopez',gbsa='water',ewin=500)
 
     mol = Run(crest_conformer_calculator)
 
@@ -41,7 +42,7 @@ def get_lowest_conformer(smiles,name=None):
     os.makedirs('SP',exist_ok=True)
     os.chdir('SP')
 
-    mol.refine_conformers(GAUSSIAN,nproc=16,mem=120,jobname='{0}-sp-refine-conformers'.format(name),runtype='sp',method='B3LYP/6-31G',empiricaldispersion='GD3bj')
+    mol.RefineConformers(GAUSSIAN,nproc=16,mem=120,jobname='{0}-sp-refine-conformers'.format(name),runtype='sp',method='B3LYP/6-31G',empiricaldispersion='GD3bj')
 
     os.chdir('../')
 
@@ -56,7 +57,7 @@ def get_lowest_conformer(smiles,name=None):
     if len(mol.conformers) > 10:
         mol.conformers = mol.conformers[0:10]
 
-    mol.refine_conformers(GAUSSIAN,nproc=16,mem=120,jobname='{0}-opt-refine-conformers'.format(name),runtype='opt_freq',method='B3LYP/6-31G',empiricaldispersion='GD3bj',opt='calcfc')
+    mol.RefineConformers(GAUSSIAN,nproc=16,mem=120,jobname='{0}-opt-refine-conformers'.format(name),runtype='opt_freq',method='B3LYP/6-31G',empiricaldispersion='GD3bj',opt='calcfc')
 
     os.chdir('../')
 
@@ -68,6 +69,7 @@ def get_lowest_conformer(smiles,name=None):
     os.chdir('lowest_energy_conformers')
 
     mol.conformers[0].ToXYZ('{0}-lowestconf.xyz'.format(name))
+    mol.ConformersToXYZ('{0}-allconf.xyz'.format(name))
 
     os.chdir('../')
 

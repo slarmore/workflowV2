@@ -3,6 +3,7 @@ crest_exe = '/work/lopez/xtb/crest'
 xtb_exe = '/work/lopez/xtb/xtb_6.2.3/bin/xtb'
 g16root = '/work/lopez/'
 
+
 #SLURM SETTINGS
 default_partition = 'short'
 

@@ -1,44 +1,48 @@
 #interface with CREST
 
+########################################################################################################
+#imports
+from shutil import Error
 from .. import calculator
 from .. import molecule
-from ..config import * #this is where the crest exe is defined
+from ..config import * #this is where the exe should be defined
+
 import re
 import numpy as np
 from ..utils import cleaner
 from ..message import warning,log,display
-from ..config import max_conformers
+import os
 
 
 
-def CREST(mol,jobname,runtype,nproc=1,mem=1,time='1-00:00:00',partition=default_partition,**kwargs):
-    '''This function takes in a mol object and creates a calculator 
-    object that can preform the requested calculation given 
-    the setup here
+########################################################################################################
+#calculator creation function
+def CREST(mol,jobname,runtype,nproc=1,mem=1,time=default_time,partition=default_partition,max_confs=500,try_count=0,delete=['METADYN*','MRMSD','NORMMD*','*.tmp','wbo'],**kwargs):
+    '''Create calculator object for CREST conformer generation'''
     
-    need to give 
-    
-    '''
-    #check that the input is a Mol object
+
+#######################
+#check for valid input#
     if not isinstance(mol,molecule.Mol):
-        raise TypeError('Expected Mol object')
+        if isinstance(mol,molecule.Conformer):
+            #upgrade it to a mol object 
+            mol = mol.ToMol()
+        else:
+            raise TypeError('Expected Mol or Conformer object')
     
-    #always return a modified copy of the mol, rather than the modifying the mol itself
-    mol = mol.copy()
-    #supported CREST runtypes
-    supported_runtypes = {
-
-        'confsearch':['ewin','rthr','ethr','bthr','temp','esort','chrg','uhf',
+    #key = runtype, value = list of acceptable arguments passed for calculation
+    supported_runtypes = {'confsearch':['ewin','rthr','ethr','bthr','temp','esort','chrg','uhf',
                       'gbsa','alpb','opt','mdlen','shake','tstep','vbdump','zs','nocross',
                       'mrest','nci','tnmd']
-
-                      #options that seem not to work no matter what I do... 'conds','cheavy','cmetal','clight'
     }
-    
+
     if not runtype in supported_runtypes:
-        raise NotImplementedError('The {0} runtype is not implemented for CREST\n\nPlease use:\n{1}'.format(runtype,','.join([key for key in supported_runtypes])))
-        
-    #parse all of these command line options
+        raise NotImplementedError('The {0} runtype is not implemented\n\nPlease use:\n{1}'.format(runtype,','.join([key for key in supported_runtypes])))
+
+
+############################
+#parse calculation keywords#
+
     arguments = ['-verbose']            #start with keywords always used
     for key, value in kwargs.items():
         if key in supported_runtypes[runtype]:
@@ -50,17 +54,21 @@ def CREST(mol,jobname,runtype,nproc=1,mem=1,time='1-00:00:00',partition=default_
         else:
             raise SyntaxError('The {0} keyword does not match the available options for the {1} runtype:\n{2}'.format(key,runtype,','.join(supported_runtypes[runtype])))
 
+#########################   
+#construct input file(s)#
+    directory = os.path.abspath(jobname) + '/'
+    basename_full = directory +  jobname + '-try{0}'.format(try_count) 
+
     #the input for CREST is just an xyz file, unless constraints are present, 
     # then need additional constraint file
-
-    #xyz file
     xyz = '{0}\n{1}\n{2}'.format(mol.natoms,jobname,mol.xyzstring)
-
+    
+    #create string with the input file
     #constraints if necessary
     if len(mol.constraints) > 0:
         if not '-subrmsd' in arguments:
             arguments.append('-subrmsd')
-        arguments.append('-cinp {0}.c'.format(jobname))
+        arguments.append('-cinp {0}-try{1}.c'.format(jobname,try_count))
 
         constraintfile = ['$constrain']
         
@@ -83,7 +91,7 @@ def CREST(mol,jobname,runtype,nproc=1,mem=1,time='1-00:00:00',partition=default_
                 constrained_atoms.append(constraint[3]+1)
         
         constraintfile.append('force constant={0}'.format(crest_constraint_force_constrant))
-        constraintfile.append('reference={0}.ref'.format(jobname))
+        constraintfile.append('reference={0}-try{1}.ref'.format(jobname,try_count))
         constraintfile.append('$metadyn')
 
         #get the list of atoms NOT constrained to include in the metadynamics
@@ -121,97 +129,148 @@ def CREST(mol,jobname,runtype,nproc=1,mem=1,time='1-00:00:00',partition=default_
     else:
         input = [xyz]
 
+
+
+########################
+#define the run command#
+
     #combine all of the parsed route line arguments
     arguments = ' '.join(arguments)
 
     #execution command
-    command = 'ulimit -s unlimited\nexport OMP_STACKSIZE={0}G\nexport OMP_NUM_THREADS={1},1\n{2} INPUTFILE -xnam {3} -T {1} {4} > OUTPUTFILE'.format(mem,nproc,crest_exe,xtb_exe,arguments)
 
-    #return the calculator object to either run with calculator.Run or calculator.RunBatch
-    return(calculator.Calculator(input=input,
+    command = 'ulimit -s unlimited\nexport OMP_STACKSIZE={0}G\nexport OMP_NUM_THREADS={1},1\n{2} INPUTFILE -xnam {3} -T {1} {4} > OUTPUTFILE'.format(mem,nproc,crest_exe,xtb_exe,arguments,jobname,try_count)
+
+
+##########################################################
+#create calculator object to actually run the calculation#
+    #need to combine all of the arguments into a single dict for failure resubmissions
+    argument_dict = kwargs
+    argument_dict['runtype'] = runtype
+    argument_dict['time'] = time
+    argument_dict['partition'] = partition
+    argument_dict['nproc'] = nproc
+    argument_dict['mem'] = mem
+    argument_dict['jobname'] = jobname
+    argument_dict['mol'] = mol
+    argument_dict['max_confs'] = max_confs
+
+    return(calculator.Calculator(jobname=jobname,
+                input=input,
                 command=command,
                 nproc=nproc,
                 mem=mem,
                 time=time,
                 partition=partition,
-                program=crest(),
-                runtype=runtype,
-                jobname=jobname,
-                mol=mol))
+                program=crest(delete=delete),
+                mol=mol,
+                argument_dict=argument_dict,
+                try_count=try_count))
 
 
 
-
+########################################################################################################
+#software class
 class crest:
-    def __init__(self):
+
+###################
+#define attributes#
+    def __init__(self,delete=['METADYN*','MRMSD','NORMMD*','*.tmp','wbo']):
         self.program_name = 'crest'
         self.infiles = ['xyz','c','ref']
         self.outfiles = ['out']
+        self.normal_termination_line = -1   #where to look to see if calculation was successful
+        self.normal_termination_string = 'CREST terminated normally.'   #what to look for
+        self.unessesary_files = delete
 
+    #######################################
+    #keywords to search for in output file#
+        #key = string match in output file, value = function to read that section of the output
+        self.keywords = {
+                          'number of unique conformers for further calc': confs #wrap up getting all 
+                                                                                #conformers here
+                                                                                #crest is a bit of a special case
+        }
+
+        #precompile all the regrex for efficiency's sake
+        self.keys = [key for key in self.keywords]
+        self.keys_regrexs = [re.compile(key) for key in self.keys]
+
+####################
+#read_output method#
     def read_output(self,calculator,slurmoutput):
-        #first check for normal termination
         output = open(calculator.outputfile_full,'r')
         output_lines = output.read().splitlines()
         
-        #start at bottom of file where it's more likely to be found
-        for line in reversed(output_lines):
-            if re.search('CREST terminated normally.',line):
+        #clear the property dict and warning list
+        calculator.mol.properties = {}
+        calculator.mol.warnings = []
+        #remove the unessesary leftover files
+        #add the directory
+        matches = [calculator.dir + match for match in self.unessesary_files]
+        cleaner(matches)
 
-                #remove the unessesary leftover files
-                matches = ['METADYN*','MRMSD','NORMMD*','*.tmp','wbo']
-                #add the directory
-                matches = [calculator.dir + match for match in matches]
-                cleaner(matches)
+        #for each line, check if any keywords are found
+        #if so, use the matching function to update the mol object
+        for line_number,line in enumerate(output_lines):
+            for key,key_regrex in zip(self.keys,self.keys_regrexs):
+                if key_regrex.search(line):
+                    self.keywords[key](calculator.mol,line_number,line,output_lines,calculator)
+        
 
-                if calculator.runtype == 'confsearch':
-                    result = confsearch(output_lines,calculator.dir,calculator.mol)
-                output.close()
-                return(result)
-            else:
-                with open(slurmoutput,'r') as slurm:
-                    slurmoutput_content = slurm.read()
+        if not re.search(self.normal_termination_string,output_lines[self.normal_termination_line]):
+            with open(slurmoutput,'r') as slurm:
+                slurmoutput_content = slurm.read()
 
-                    warning('error in CREST calculation\nSlurm output:\n\n{0}\n\n'.format(slurmoutput_content))
-                
-                warning('last 10 lines of the output:\n\n{0}'.format('\n'.join(output_lines[-10:-1])))
+                warning('error in {0} calculation\nSlurm output:\n\n{1}\n\n'.format(self.program_name,slurmoutput_content))
+            
+            warning('last 10 lines of the output:\n\n{0}'.format('\n'.join(output_lines[-10:-1])))
 
-                output.close()
-                return(None)
+            calculator.mol.warnings.append('{0}_Abnormal_Termination'.format(self.program_name))
 
-def confsearch(output_lines,dir,mol):
-    '''Things to extract
-            1. conformer energies
-            2. conformer geometries - from the crest_conformers.xyz file
+            output.close()
+
+        return(calculator.mol)
+
+###################
+#fix_errors method#
+    def fix_errors(self,mol,input_name,kwargs):
+        raise NotImplementedError('No error handling implemented for CREST')
+        return(kwargs)
+
+#################
+#resubmit method#
+    def resubmit(self,kwargs,try_count):
+        raise NotImplementedError('No resubmission implemented for CREST')
+        return(CREST(**kwargs,try_count=try_count))
 
 
-            needs to get the stuff required for a conformer object
-            energy,atoms,coords,xyz=None,tags={},constraints=[]
-    
-    '''
+
+########################################################################################################
+#Functions for parsing output
+#each of these functions should always take the same arguments
+def confs(mol,line_number,line,output_lines,calculator):
+    #crest is a bit different from other programs, this is the only function to get all
+    #of the conformer information and update the mol conformers in one
     energies = []
     conformers = []
 
-
-    for line_number,line in enumerate(output_lines):
-        #line to look for vvv
-        #number of unique conformers for further calc #number here 
-        if re.search('number of unique conformers for further calc',line):
-            nconfs = int(line.split()[-1])
-            if nconfs > max_conformers:
+    nconfs = int(line.split()[-1])
+    max_conformers = calculator.argument_dict['max_confs']
+    if nconfs > max_conformers:
                 warning('CREST generated more than the max_conformers ({0}), only retaining the lowest {0}'.format(max_conformers))
                 nconfs = max_conformers
-                
-            energies = [float(confline.split()[-1]) for confline in output_lines[line_number+1:line_number+1+nconfs]]
-                
 
-    with open('{0}/crest_conformers.xyz'.format(dir),'r') as conformerfile:
+    energies = [float(confline.split()[-1]) for confline in output_lines[line_number+1:line_number+1+nconfs]]
+ 
+    with open('{0}/crest_conformers.xyz'.format(calculator.dir),'r') as conformerfile:
         conformerslines = conformerfile.read().splitlines()
         lines_per_xyz_block = mol.natoms + 2
         for conf_id in range(0,nconfs):
             start = (conf_id * lines_per_xyz_block) + 2   #don't care about the natom and title lines
             end = ( conf_id + 1 ) * lines_per_xyz_block
             rawxyz = conformerslines[start:end]
-            
+
             coords = []
             atoms = []
             xyz = []
@@ -233,12 +292,7 @@ def confsearch(output_lines,dir,mol):
             atoms = np.array(atoms)
             coords = np.array(coords)
 
-            conformers.append(molecule.Conformer(energies[conf_id],atoms,coords,xyz=xyz,tags={'origin':'CREST'},constraints=mol.constraints))
+            conformers.append(molecule.Conformer(atoms=atoms,coords=coords,energy=energies[conf_id],tags={'origin':'CREST'},constraints=mol.constraints,charge=mol.charge,mult=mol.mult))
     
     #return the original mol object with the updated conformers
     mol.conformers = conformers
-    return(mol)
-
-
-
-
