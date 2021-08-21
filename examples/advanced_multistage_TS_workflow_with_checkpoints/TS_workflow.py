@@ -126,7 +126,7 @@ def main(input_file,
 
     if mol.tags['step'] < 2:
 
-        #Single points with TDDFT
+        #Single points to re-rank conformers
         os.makedirs('SP',exist_ok=True)
         os.chdir('SP')
 
