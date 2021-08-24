@@ -43,6 +43,12 @@ def CREST(mol,jobname,runtype,nproc=1,mem=1,time=default_time,partition=default_
 ############################
 #parse calculation keywords#
 
+    #make sure the charge and multiplicity are correct
+    if not 'chrg' in kwargs and mol.charge != 0:
+        kwargs['chrg'] = mol.charge
+    if not 'uhf' in kwargs and mol.mult != 1:
+        kwargs['uhf'] = (mol.mult - 1 ) / 2
+
     arguments = ['-verbose']            #start with keywords always used
     for key, value in kwargs.items():
         if key in supported_runtypes[runtype]:
@@ -133,7 +139,7 @@ def CREST(mol,jobname,runtype,nproc=1,mem=1,time=default_time,partition=default_
 
 ########################
 #define the run command#
-
+    
     #combine all of the parsed route line arguments
     arguments = ' '.join(arguments)
 
