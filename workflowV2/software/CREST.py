@@ -33,7 +33,7 @@ def CREST(mol,jobname,runtype,nproc=1,mem=1,time=default_time,partition=default_
     #key = runtype, value = list of acceptable arguments passed for calculation
     supported_runtypes = {'confsearch':['ewin','rthr','ethr','bthr','temp','esort','chrg','uhf',
                       'gbsa','alpb','opt','mdlen','shake','tstep','vbdump','zs','nocross',
-                      'mrest','nci','tnmd']
+                      'mrest','nci','tnmd','cbonds','cheavy','clight']
     }
 
     if not runtype in supported_runtypes:
