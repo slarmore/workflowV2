@@ -376,12 +376,14 @@ class gaussian:
             log('Fixed SCF_Error')
 
         if 'negative_frequency' in mol.warnings:
-            kwargs = add_or_read_fc(mol,input_name,kwargs)
-            log('Fixed negative_frequency')
+            if kwargs['runtype'] == 'opt_freq':
+                kwargs = add_or_read_fc(mol,input_name,kwargs)
+                log('Fixed negative_frequency')
 
         if 'saddle_point' in mol.warnings:
-            kwargs = add_or_read_fc(mol,input_name,kwargs)
-            log('Fixed saddle_point')
+            if kwargs['runtype'] == 'opt_freq':
+                kwargs = add_or_read_fc(mol,input_name,kwargs)
+                log('Fixed saddle_point')
             
         #check if there is a SCF converged before taking a non-existant guess
         if 'electronic_energy' in mol.properties:
