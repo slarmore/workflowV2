@@ -254,7 +254,8 @@ class gaussian:
                              'Total Energy, E': tddft_energy,
                              'Excitation energies and oscillator strengths': excited_states,
                              'Number of steps exceeded': steps_exceeded,
-                             '%chk=' : chk_file
+                             '%chk=' : chk_file,
+                             'You must use ReadCartesianFC, FCCards, or CalcFC with IRC' : irc_missing_fc
         }
 
         #precompile all the regrex for efficiency's sake
@@ -315,6 +316,14 @@ class gaussian:
 
         #IRC is special case, probably don't want to start at the end point
         if kwargs['runtype'] ==  'irc':
+            if 'IRC_without_fc' in mol.warnings:
+                if 'irc' in kwargs:
+                    current = kwargs['irc']  
+                    kwargs['irc'] = current + ',calcfc'
+                else:
+                    kwargs['irc'] = 'calcfc'
+                return(kwargs)
+            
             if 'irc' in kwargs:
                 current = kwargs['irc']
                 if not re.search('recalc',current,re.IGNORECASE):
@@ -697,3 +706,13 @@ def steps_exceeded(mol,line_number,line,output_lines,calculator):
     '''.format(calculator.jobname))
 
     mol.warnings.append('out_of_optimization_steps')
+    
+    
+def irc_missing_fc(mol,line_number,line,output_lines,calculator):
+    warning('''IRC job needs force constrants either read in, or computed
+    
+    The mol.warnings = ['IRC_without_fc']
+    
+    The failure code will add calcfc to get these force constants if
+    more than 1 try is requested''')
+    mol.warnings.append('IRC_without_fc')
