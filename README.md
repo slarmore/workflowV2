@@ -5,7 +5,7 @@ A package for automating QM calculation workflows
 Inspired by RDkit and the Atomic Simulation Environment's design principles\
 but adapted for a QM focus in the HPC job scheduler environment
 
-More here soon!
+**More here soon!**
 
 
 
