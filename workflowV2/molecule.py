@@ -145,7 +145,7 @@ class Mol(FrozenClass):
         if title is not None:
             out.append(str(title))
         elif 'title' in self.tags:
-            out.append(str(self.tags['title {0}'.format(self.energy)]))
+            out.append(str(self.tags['title']))
         else:
             out.append(str(self.energy))
 
