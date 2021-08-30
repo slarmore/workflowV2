@@ -464,7 +464,8 @@ def SmilesToMol(smiles,
             charge=0,
             mult=1,
             constraints=[],
-            seed=0):
+            seed=0,
+            maxAttempts=5000):
     '''Wrapper for taking in a smiles and using RDKIT to generate conformers and energies'''
 
     if nconfs < 1:
@@ -472,7 +473,7 @@ def SmilesToMol(smiles,
 
     rdkitmol = Chem.MolFromSmiles(smiles)
     rdkitmol = AllChem.AddHs(rdkitmol,addCoords=True)
-    AllChem.EmbedMultipleConfs(rdkitmol,numConfs=nconfs,enforceChirality=True,numThreads=0,randomSeed=seed)
+    AllChem.EmbedMultipleConfs(rdkitmol,numConfs=nconfs,enforceChirality=True,numThreads=0,randomSeed=seed,maxAttempts=maxAttempts)
     energies = AllChem.UFFOptimizeMoleculeConfs(rdkitmol,numThreads=0)
     energies = [energy[1] for energy in energies]
 
