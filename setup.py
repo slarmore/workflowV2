@@ -10,7 +10,7 @@ def read(fname):
 
 setup(
     name = "workflowV2",
-    version = "2.2213",
+    version = "2.2214",
     author = "Patrick Neal",
     author_email = "prnmac12@gmail.com",
     description = ("An automation tool for QM calculations"),
