@@ -464,16 +464,74 @@ def SmilesToMol(smiles,
             charge=0,
             mult=1,
             constraints=[],
-            seed=0,
-            maxAttempts=5000):
+                
+            #aruguments for embedmultipleconfs
+            randomSeed=0,
+            maxAttempts=5000,
+            numThreads=0,
+            nonBondedThresh=10,
+            ignoreInterfragInteractions=True,
+            pruneRmsThresh=0.005,
+            useRandomCoords=False,
+            enforceChirality=True,
+            boxSizeMult=2.0,
+            randNegEig=True,
+            numZeroFail=1,
+            coordMap={},
+            orceTol=0.001,
+            ignoreSmoothingFailures=False,
+            useExpTorsionAnglePrefs=True,
+            useBasicKnowledge=True,
+            printExpTorsionAngles=False,
+            useSmallRingTorsions=False,
+            useMacrocycleTorsions=False,
+         
+            #arguments for conformer opts
+            opt='UFF',
+            maxIters=10000,
+
+               
+               
+               
+               ):
     '''Wrapper for taking in a smiles and using RDKIT to generate conformers and energies'''
 
     if nconfs < 1:
         raise IndexError('Must generate at least 1 conformer')
+    if not opt in ['UFF','MMF']:
+        raise KeyError("opt argument must be either 'UFF' or 'MMF'")
 
     rdkitmol = Chem.MolFromSmiles(smiles)
     rdkitmol = AllChem.AddHs(rdkitmol,addCoords=True)
-    AllChem.EmbedMultipleConfs(rdkitmol,numConfs=nconfs,enforceChirality=True,numThreads=0,randomSeed=seed,maxAttempts=maxAttempts)
+    
+    num_generated = 0
+    while num_generated < nconfs:
+        confs = AllChem.EmbedMultipleConfs(rdkitmol,
+                               randomSeed=randomSeed,
+                               maxAttempts=maxAttempts,
+                               numThreads=numThreads,
+                               nonBondedThresh=nonBondedThresh,
+                               ignoreInterfragInteractions=ignoreInterfragInteractions,
+                               pruneRmsThresh=pruneRmsThresh,
+                               useRandomCoords=useRandomCoords,
+                               enforceChirality=enforceChirality,
+                               boxSizeMult=boxSizeMult,
+                               randNegEig=randNegEig,
+                               numZeroFail=numZeroFail,
+                               coordMap=coordMap,
+                               forceTol=forceTol,
+                               ignoreSmoothingFailures=ignoreSmoothingFailures,
+                               useExpTorsionAnglePrefs=useExpTorsionAnglePrefs,
+                               useBasicKnowledge=useBasicKnowledge,
+                               printExpTorsionAngles=printExpTorsionAngles,
+                               useSmallRingTorsions=useSmallRingTorsions,
+                               useMacrocycleTorsions=useMacrocycleTorsions)
+        
+        num_generated = len(confs)
+        pruneRmsThresh -= -0.001
+        log('lowered rms threshold to {0} to find more than {1} conformers'.format(pruneRmsThresh,num_generated)
+    
+    if opt == 'UFF':
     energies = AllChem.UFFOptimizeMoleculeConfs(rdkitmol,numThreads=0)
     energies = [energy[1] for energy in energies]
 
