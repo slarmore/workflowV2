@@ -541,10 +541,10 @@ def SmilesToMol(smiles,
                                                      mmffVarient=mmffVarient,
                                                      nonBondedThresh=nonBondedThresh,
                                                      ignoreInterfragInteractions=ignoreInterfragInteractions)
-   else:
-       raise KeyError("opt argument must be either 'UFF' or 'MMF'")
+    else:
+        raise KeyError("opt argument must be either 'UFF' or 'MMF'")
             
-   energies = [energy[1] for energy in energies]
+    energies = [energy[1] for energy in energies]
 
     if 'origin' not in tags:
         tags['origin'] = 'rdkit'
