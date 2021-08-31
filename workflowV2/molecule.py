@@ -528,7 +528,7 @@ def SmilesToMol(smiles,
         
         num_generated = len(confs)
         pruneRmsThresh -= -0.001
-        log('lowered rms threshold to {0} to find more than {1} conformers'.format(pruneRmsThresh,num_generated)
+        log('lowered rms threshold to {0} to find more than {1} conformers'.format(pruneRmsThresh,num_generated))
     
     if opt == 'UFF':
         energies = AllChem.UFFOptimizeMoleculeConfs(rdkitmol,
