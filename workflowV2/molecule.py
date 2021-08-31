@@ -489,16 +489,15 @@ def SmilesToMol(smiles,
             #arguments for conformer opts
             opt='UFF',
             maxIters=10000,
-
-               
-               
-               
-               ):
+            mmffVarient='MMFF94',
+            nonBondedThresh=100.0,
+            ignoreInterfragInteractions=True,
+            vdwThresh=10.0):
     '''Wrapper for taking in a smiles and using RDKIT to generate conformers and energies'''
 
     if nconfs < 1:
         raise IndexError('Must generate at least 1 conformer')
-    if not opt in ['UFF','MMF']:
+    if not opt in ['UFF','MMFF']:
         raise KeyError("opt argument must be either 'UFF' or 'MMF'")
 
     rdkitmol = Chem.MolFromSmiles(smiles)
@@ -532,8 +531,20 @@ def SmilesToMol(smiles,
         log('lowered rms threshold to {0} to find more than {1} conformers'.format(pruneRmsThresh,num_generated)
     
     if opt == 'UFF':
-    energies = AllChem.UFFOptimizeMoleculeConfs(rdkitmol,numThreads=0)
-    energies = [energy[1] for energy in energies]
+        energies = AllChem.UFFOptimizeMoleculeConfs(rdkitmol,
+                                                    maxIters=maxIters,
+                                                    ignoreInterfragInteractions=ignoreInterfragInteractions,
+                                                    vdwThresh=vdwThresh)
+    elif opt == 'MMFF':
+        energies = AllChem.MMFFOptimizeMoleculeConfs(rdkitmol,
+                                                     maxIters=maxIters,
+                                                     mmffVarient=mmffVarient,
+                                                     nonBondedThresh=nonBondedThresh,
+                                                     ignoreInterfragInteractions=ignoreInterfragInteractions)
+   else:
+       raise KeyError("opt argument must be either 'UFF' or 'MMF'")
+            
+   energies = [energy[1] for energy in energies]
 
     if 'origin' not in tags:
         tags['origin'] = 'rdkit'
