@@ -466,7 +466,7 @@ def SmilesToMol(smiles,
             constraints=[],
                 
             #aruguments for embedmultipleconfs
-            randomSeed=0,
+            randomSeed=-1,
             maxAttempts=5000,
             numThreads=0,
             pruneRmsThresh=0.005,
@@ -503,6 +503,13 @@ def SmilesToMol(smiles,
     
     num_generated = 0
     while num_generated < nconfs:
+        if num_generated != 0:
+            pruneRmsThresh -= -0.001
+            if pruneRmsThresh < 0.0:
+                break
+            warning('lowered rms threshold to {0} to find more than {1} conformers'.format(pruneRmsThresh,num_generated))
+
+   
         confs = AllChem.EmbedMultipleConfs(rdkitmol,
                                randomSeed=randomSeed,
                                maxAttempts=maxAttempts,
@@ -521,11 +528,9 @@ def SmilesToMol(smiles,
                                printExpTorsionAngles=printExpTorsionAngles,
                                useSmallRingTorsions=useSmallRingTorsions,
                                useMacrocycleTorsions=useMacrocycleTorsions)
-        
+       
         num_generated = len(confs)
-        pruneRmsThresh -= -0.001
-        log('lowered rms threshold to {0} to find more than {1} conformers'.format(pruneRmsThresh,num_generated))
-    
+        
     if opt == 'UFF':
         energies = AllChem.UFFOptimizeMoleculeConfs(rdkitmol,
                                                     maxIters=maxIters,
