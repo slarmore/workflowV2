@@ -531,7 +531,7 @@ def SmilesToMol(smiles,
                                useSmallRingTorsions=useSmallRingTorsions,
                                useMacrocycleTorsions=useMacrocycleTorsions)
        
-        num_generated = len(confs)
+        num_generated = len(rdkitmol.GetConformers())
         
     if opt == 'UFF':
         energies = AllChem.UFFOptimizeMoleculeConfs(rdkitmol,
