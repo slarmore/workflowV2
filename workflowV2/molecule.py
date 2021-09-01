@@ -501,13 +501,15 @@ def SmilesToMol(smiles,
     rdkitmol = Chem.MolFromSmiles(smiles)
     rdkitmol = AllChem.AddHs(rdkitmol,addCoords=True)
     
+    count = 0
     num_generated = 0
     while num_generated < nconfs:
+        count += 1
         if num_generated != 0:
             pruneRmsThresh -= -0.001
             if pruneRmsThresh < 0.0:
                 break
-            warning('lowered rms threshold to {0} to find more than {1} conformers'.format(pruneRmsThresh,num_generated))
+            warning('lowered rms threshold to {0} to find more than {1} conformers for {2} after {3} rounds'.format(pruneRmsThresh,num_generated,smiles,count))
 
    
         confs = AllChem.EmbedMultipleConfs(rdkitmol,
