@@ -215,7 +215,7 @@ class Mol(FrozenClass):
 
 #######################
 #convinience functions#
-    def RefineConformers(self,calculator_class,jobname,tries=1,ignore=False,**kwargs):
+    def RefineConformers(self,calculator_class,jobname,tries=1,ignore=False,inplace=True,**kwargs):
         '''take in a generic calculator to apply to each conformer
         then re-rank the conformers with relative energies'''
 
@@ -225,6 +225,10 @@ class Mol(FrozenClass):
         #look for {conf} in any of the kwarg values and replace with conformer #
         #this will allow specification of specific oldchk file for each conformer
         #when restarting a gaussian calculation
+        
+        if not inplace:
+            self = self.copy()
+            
         calculators = []
         for index,conf in enumerate(self.conformers):
             local_kwargs = kwargs.copy()
@@ -244,6 +248,9 @@ class Mol(FrozenClass):
         self.conformers = conformers
         for conf,energy in zip(self.conformers,energies):
             conf.energy = energy
+            
+        if not inplace:
+            return(self)
 
     def generate_rdkit_conformers(self,nconfs=5,tags={}):
         if self.rdkitmol is None:
