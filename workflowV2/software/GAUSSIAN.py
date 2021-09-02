@@ -397,7 +397,7 @@ class gaussian:
 
 def add_or_read_fc(mol,input_name,kwargs):
  #check if frequencies were sucessfully computed
-    if 'frequecies' in mol.properties:
+    if 'frequencies' in mol.properties:
         #if the opt keyword was specified
         if 'opt' in kwargs:
             current = kwargs['opt']
