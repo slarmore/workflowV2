@@ -255,7 +255,8 @@ class gaussian:
                              'Excitation energies and oscillator strengths': excited_states,
                              'Number of steps exceeded': steps_exceeded,
                              '%chk=' : chk_file,
-                             'You must use ReadCartesianFC, FCCards, or CalcFC with IRC' : irc_missing_fc
+                             'You must use ReadCartesianFC, FCCards, or CalcFC with IRC' : irc_missing_fc,
+                             'Maximum number of corrector steps exceded' : irc_bad_corrector
         }
 
         #precompile all the regrex for efficiency's sake
@@ -717,4 +718,13 @@ def irc_missing_fc(mol,line_number,line,output_lines,calculator):
     
     The failure code will add calcfc to get these force constants if
     more than 1 try is requested''')
+    mol.warnings.append('IRC_without_fc')
+    
+def irc_bad_corrector(mol,line_number,line,output_lines,calculator):
+    warning('''IRC job failed
+    
+    The mol.warnings = ['IRC_bad_corrector']
+    
+    Using recorrect = never, reducing the stepsize, or calculating fc
+    can help this''')
     mol.warnings.append('IRC_without_fc')
