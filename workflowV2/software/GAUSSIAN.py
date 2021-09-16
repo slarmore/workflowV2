@@ -405,7 +405,7 @@ def add_or_read_fc(mol,input_name,kwargs):
             if re.search('calcall',current,re.IGNORECASE):
                 pass
             #if it already has readfc, leave it be
-            elif re.search('readfc',current.re.IGNORECASE):
+            elif re.search('readfc',current,re.IGNORECASE):
                 pass
             #if its recalcfc, the two together won't work, default to just readfc as the preferred fix
             elif re.search('recalcfc',current,re.IGNORECASE):
