@@ -404,6 +404,9 @@ def add_or_read_fc(mol,input_name,kwargs):
             current = kwargs['opt']
             if re.search('calcall',current,re.IGNORECASE):
                 pass
+            #if it already has readfc, leave it be
+            elif re.search('readfc',current.re.IGNORECASE):
+                pass
             #if its recalcfc, add readfc so the first is read
             elif re.search('recalcfc',current,re.IGNORECASE):
                 kwargs['opt'] = current + ',readfc'
