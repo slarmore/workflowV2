@@ -350,9 +350,9 @@ class gaussian:
                 #if already has recalcfc, ignore
                 elif re.search('recalcfc',current,re.IGNORECASE):
                     pass
-                #if has just calcfc, then replace with recalcfc
+                #if has just calcfc, then substitute with recalcfc
                 elif re.search('calcfc',current,re.IGNORECASE):
-                    kwargs['opt'] = current.replace('calcfc','recalcfc=10')
+                    kwargs['opt'] = re.sub('calcfc','recalcfc=10',current,re.IGNORECASE)
                 else:
                     kwargs['opt'] =  current + ',recalcfc=10'
             #if opt keyword was not specified
@@ -407,12 +407,27 @@ def add_or_read_fc(mol,input_name,kwargs):
             #if it already has readfc, leave it be
             elif re.search('readfc',current.re.IGNORECASE):
                 pass
-            #if its recalcfc, add readfc so the first is read
+            #if its recalcfc, the two together won't work, default to just readfc as the preferred fix
             elif re.search('recalcfc',current,re.IGNORECASE):
-                kwargs['opt'] = current + ',readfc'
+                #need to get the full string to substitute... we know to search for 'recalcfc' 
+                #there will be a '=#' and the argument is ended by either the end of the string, or a ','
+                
+                recalc_string_start = re.search('recalcfc',current,re.IGNORECASE).start()
+              
+                #loop through remaining characters until we find ',' or hit the end of the string
+                for recalc_string_end,character in enumerate(current[recalc_string_start+9:]):
+                    if character == ',':
+                        break
+                #if it is the end of the string, can't slice with the index bc it will cutt off the
+                #last char, so conver to None
+                if recalc_string_end == len(current) -1:
+                    recalc_string_end = None
+                                                   
+                kwargs['opt'] = current.replace(current[recalc_string_start,recalc_string_end],'readfc')
+                
             #if it's just calcfc, then read in the fc, replacing calcfc
             elif re.search('calcfc',current,re.IGNORECASE):
-                kwargs['opt'] = current.replace('calcfc','readfc')
+                kwargs['opt'] = re.sub('calcfc','readfc',current,re.IGNORECASE)
             else:
                 kwargs['opt'] = current + ',readfc'
         #if no opt keyword was specified, create it
