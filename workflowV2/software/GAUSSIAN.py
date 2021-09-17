@@ -418,6 +418,8 @@ def add_or_read_fc(mol,input_name,kwargs):
                 for recalc_string_end,character in enumerate(current[recalc_string_start+9:]):
                     if character == ',':
                         break
+                recalc_string_end += 9 + recalc_string_start
+
                 #if it is the end of the string, can't slice with the index bc it will cutt off the
                 #last char, so conver to None
                 if recalc_string_end == len(current) -1:
