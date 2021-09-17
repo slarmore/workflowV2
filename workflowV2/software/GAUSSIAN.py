@@ -423,7 +423,7 @@ def add_or_read_fc(mol,input_name,kwargs):
                 if recalc_string_end == len(current) -1:
                     recalc_string_end = None
                                                    
-                kwargs['opt'] = current.replace(current[recalc_string_start,recalc_string_end],'readfc')
+                kwargs['opt'] = current.replace(current[recalc_string_start:recalc_string_end],'readfc')
                 
             #if it's just calcfc, then read in the fc, replacing calcfc
             elif re.search('calcfc',current,re.IGNORECASE):
