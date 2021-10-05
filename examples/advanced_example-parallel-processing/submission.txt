@@ -1,0 +1,4 @@
+--smiles=O=C(C1=CC([Y])=CC=C1)C2=CC=CC=C2
+--mol_name=benzophenone
+--substituents=[*:1][H]
+--names=H
