@@ -45,7 +45,7 @@ def excitation_flow(mols,mol_names,output_energies,solvent,dftmethod,tddftmethod
                                     time=time,
                                     partition=partition) for tddft,name in zip(tddfts,mol_names)]
 
-        tddfts = RunBatch(calculators,tries=1,jobname=f'{mol_name}-tddft')
+        tddfts = RunBatch(calculators,tries=1,jobname='tddft')
 
         for tddft,name in zip(tddfts,mol_names):
             tddft.checkpoint('{0}-tddft.mol'.format(name))

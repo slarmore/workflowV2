@@ -169,3 +169,14 @@ def unlock_csv(output_energies,who):
     os.remove(output_energies.split('.')[0]+'.lock')
     message.log(f'{who} unlocked csv')
 
+
+def radical_electrons(mol):
+    nradicals = 0
+
+    for atom in mol.GetAtoms():
+        nradicals += atom.GetNumRadicalElectrons()
+
+    return(nradicals)
+
+
+

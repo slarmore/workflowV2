@@ -5,7 +5,7 @@ from workflowV2 import message
 import pandas as pd
 import os
 from datetime import datetime
-from .util import open_csv,unlock_csv,look_for_restart,par_proc
+from .util import open_csv,unlock_csv,look_for_restart,par_proc,radical_electrons
 
 #################################################################
 
@@ -173,7 +173,14 @@ def reduction_flow(mols,mol_names,output_energies,solvent,dftmethod,preopt_metho
 
         for reduced in reduceds:
             reduced.charge -= 1
-            reduced.mult = int((abs(reduced.charge / 2) * 2) + 1)
+
+            n_radical_electrons = radical_electrons(reduced.rdkitmol)
+            n_radical_electrons += 1
+            multiplicity = abs(n_radical_electrons) + 1
+
+
+            reduced.mult = multiplicity #int(((oxidized.charge / 2) * 2) + 1)
+
             reduced.tags['step'] = 0
 
 ##################################################################
