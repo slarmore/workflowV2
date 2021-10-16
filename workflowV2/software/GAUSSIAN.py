@@ -17,20 +17,20 @@ import os
 #calculator creation function
 def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time=default_time,partition=default_partition,oldchk=None,TS=False,try_count=0,delete=['Gau*'],**kwargs):
     '''Create calculator object for Gaussian calculation'''
-    
+
 
 #######################
 #check for valid input#
     if not isinstance(mol,molecule.Mol):
         if isinstance(mol,molecule.Conformer):
-            #upgrade it to a mol object 
+            #upgrade it to a mol object
             mol = mol.ToMol()
         else:
             raise TypeError('Expected Mol or Conformer object')
 
     #always return a modified copy of the mol, rather than the modifying the mol itself
     mol = mol.copy()
-    
+
     supported_runtypes = {
         'opt':['opt','IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom','td','advanced_route_opts'],
         'opt_freq':['opt','freq','IOp','method','scrf','scf','guess','pseudo','temperature','pop','density','afterinput','empiricaldispersion','geom','td','advanced_route_opts'],
@@ -57,7 +57,7 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time=default_time,partitio
             elif len(constraint) == 3:
                 constraint_string.append('A {0} {1} {2} F'.format(constraint[0]+1,constraint[1]+1,constraint[2]+1))
             elif len(constraint) == 4:
-                constraint_string.append('D {0} {1} {2} {3} F'.format(constraint[0]+1,constraint[1]+1,constraint[2]+1,constraint[3]+1)) 
+                constraint_string.append('D {0} {1} {2} {3} F'.format(constraint[0]+1,constraint[1]+1,constraint[2]+1,constraint[3]+1))
 
         constraint_string = '\n'.join(constraint_string)
 
@@ -106,20 +106,20 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time=default_time,partitio
             raise SyntaxError('The {0} keyword does not match the available options for the {1} runtype:\n{2}'.format(key,runtype,','.join(supported_runtypes[runtype])))
 
 
-#########################   
+#########################
 #construct input file(s)#
     directory = os.path.abspath(jobname) + '/'
-    basename_full = directory +  jobname + '-try{0}'.format(try_count) 
+    basename_full = directory +  jobname + '-try{0}'.format(try_count)
     #combine all of the parsed route line arguments
     route = ' '.join(route)
 
     #to ensure that IOps will work, need to split up optfreq jobs into two steps
     if runtype == 'opt_freq':
         com = []
-        #only include oldchk on the optimization step 
+        #only include oldchk on the optimization step
         if oldchk is not None:
             com.append('%oldchk={0}'.format(os.path.abspath(oldchk)))
-        
+
         com.extend(['%chk={0}.chk'.format(basename_full),
                 '%nprocs={0}'.format(nproc),
                 '%mem={0}GB'.format(mem),
@@ -138,7 +138,7 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time=default_time,partitio
 
         if len(afterinputsection) > 0:
             com.append('\n'.join(afterinputsection))
-        
+
         #start the freq step input
         com.append('--Link1--')
 
@@ -161,13 +161,13 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time=default_time,partitio
             com.append('\n'.join(afterinputsection))
         com.append('')
 
-    #if it is not opt_freq, then only need one input section    
+    #if it is not opt_freq, then only need one input section
     else:
         com = []
-        #only include oldchk on the optimization step 
+        #only include oldchk on the optimization step
         if oldchk is not None:
             com.append('%oldchk={0}'.format(os.path.abspath(oldchk)))
-        
+
         com.extend(['%chk={0}.chk'.format(basename_full),
                 '%nprocs={0}'.format(nproc),
                 '%mem={0}GB'.format(mem),
@@ -268,7 +268,7 @@ class gaussian:
     def read_output(self,calculator,slurmoutput):
         output = open(calculator.outputfile_full,'r')
         output_lines = output.read().splitlines()
-        
+
         #clear the property dict and warning list
         calculator.mol.properties = {}
         calculator.mol.warnings = []
@@ -278,7 +278,7 @@ class gaussian:
         cleaner(matches)
 
         #define steps for gathering optimization steps
-        global step 
+        global step
         step = -1
 
         #for each line, check if any keywords are found
@@ -286,15 +286,16 @@ class gaussian:
         for line_number,line in enumerate(output_lines):
             for key,key_regrex in zip(self.keys,self.keys_regrexs):
                 if key_regrex.search(line):
+
                     self.keywords[key](calculator.mol,line_number,line,output_lines,calculator)
-        
+
 
         if not re.search(self.normal_termination_string,output_lines[self.normal_termination_line]):
             with open(slurmoutput,'r') as slurm:
                 slurmoutput_content = slurm.read()
 
                 warning('error in {0} calculation\nSlurm output:\n\n{1}\n\n'.format(self.program_name,slurmoutput_content))
-            
+
             warning('last 10 lines of the output:\n\n{0}'.format('\n'.join(output_lines[-10:-1])))
 
             calculator.mol.warnings.append('{0}_Abnormal_Termination'.format(self.program_name))
@@ -312,19 +313,19 @@ class gaussian:
 #fix_errors method#
     def fix_errors(self,mol,input_name,kwargs):
 
-        #not very elegant, but loop through the list and 
+        #not very elegant, but loop through the list and
         #add keywords to fix any known errors
 
         #IRC is special case, probably don't want to start at the end point
         if kwargs['runtype'] ==  'irc':
             if 'IRC_without_fc' in mol.warnings:
                 if 'irc' in kwargs:
-                    current = kwargs['irc']  
+                    current = kwargs['irc']
                     kwargs['irc'] = current + ',calcfc'
                 else:
                     kwargs['irc'] = 'calcfc'
                 return(kwargs)
-            
+
             if 'irc' in kwargs:
                 current = kwargs['irc']
                 if not re.search('recalc',current,re.IGNORECASE):
@@ -336,7 +337,7 @@ class gaussian:
                 kwargs['irc'] = 'recalc=5,stepsize=5'
             return(kwargs)
 
-        
+
         if 'out_of_optimization_steps' in mol.warnings:
             #if the opt keyword was specified
             if 'opt' in kwargs:
@@ -360,7 +361,7 @@ class gaussian:
                 kwargs['opt'] = 'recalcfc=10'
 
         if 'Non-Optimized' in mol.warnings:
-            #let the out_of_optimization_steps failure handle it 
+            #let the out_of_optimization_steps failure handle it
             #if it ran out of steps
             if not 'out_of_optimization_steps' in mol.warnings:
                 kwargs = add_or_read_fc(mol,input_name,kwargs)
@@ -373,7 +374,7 @@ class gaussian:
                     kwargs['scf'] = current + ',qc'
             else:
                 kwargs['scf'] = 'qc'
-            
+
             log('Fixed SCF_Error')
 
         if 'negative_frequency' in mol.warnings:
@@ -385,7 +386,7 @@ class gaussian:
             if kwargs['runtype'] == 'opt_freq':
                 kwargs = add_or_read_fc(mol,input_name,kwargs)
                 log('Fixed saddle_point')
-            
+
         #check if there is a SCF converged before taking a non-existant guess
         if 'electronic_energy' in mol.properties:
             #read in the geometry, guess, and set the oldchk
@@ -409,11 +410,11 @@ def add_or_read_fc(mol,input_name,kwargs):
                 pass
             #if its recalcfc, the two together won't work, default to just readfc as the preferred fix
             elif re.search('recalcfc',current,re.IGNORECASE):
-                #need to get the full string to substitute... we know to search for 'recalcfc' 
+                #need to get the full string to substitute... we know to search for 'recalcfc'
                 #there will be a '=#' and the argument is ended by either the end of the string, or a ','
-                
+
                 recalc_string_start = re.search('recalcfc',current,re.IGNORECASE).start()
-              
+
                 #loop through remaining characters until we find ',' or hit the end of the string
                 for recalc_string_end,character in enumerate(current[recalc_string_start+9:]):
                     if character == ',':
@@ -424,9 +425,9 @@ def add_or_read_fc(mol,input_name,kwargs):
                 #last char, so conver to None
                 if recalc_string_end == len(current) -1:
                     recalc_string_end = None
-                                                   
+
                 kwargs['opt'] = current.replace(current[recalc_string_start:recalc_string_end],'readfc')
-                
+
             #if it's just calcfc, then read in the fc, replacing calcfc
             elif re.search('calcfc',current,re.IGNORECASE):
                 kwargs['opt'] = re.sub('calcfc','readfc',current,re.IGNORECASE)
@@ -463,7 +464,7 @@ def electronic_energies(mol,line_number,line,output_lines,calculator):
     energy = float(line.split()[4])
     mol.energy = energy
     mol.properties['electronic_energy'] = energy
-    
+
     #add to list of optimization energies for
     if 'optimization_energies' in mol.properties:
         mol.properties['optimization_energies'].append(energy)
@@ -503,10 +504,10 @@ def orbital_energies(mol,line_number,line,output_lines,calculator):
                 clean_list.extend(splitapart)
             else:
                 clean_list.append(orbital)
-                
+
         occupied_orbitals.extend(list(reversed([float(energy) for energy in clean_list])))
 
-        #need to walk backward through the file and grab all of the occupied orbital energies 
+        #need to walk backward through the file and grab all of the occupied orbital energies
         # until the line does not contain 'Alpha occ. eigenvalues'
         homo_line_number -= 1
         newline = output_lines[homo_line_number]
@@ -530,7 +531,7 @@ def orbital_energies(mol,line_number,line,output_lines,calculator):
         lumo_line = output_lines[lumo_line_number].split()[4:]
         unoccupied_orbitals.extend([float(energy) for energy in lumo_line])
 
-        #need to walk forward through the file and grab all of the unoccupied orbital energies 
+        #need to walk forward through the file and grab all of the unoccupied orbital energies
         # until the line does not contain 'Alpha virt. eigenvalues'
         lumo_line_number += 1
         newline = output_lines[lumo_line_number]
@@ -547,7 +548,7 @@ def orbital_energies(mol,line_number,line,output_lines,calculator):
         mol.properties['lumo'] = lumo
         mol.properties['occupied_orbitals'] = occupied_orbitals
         mol.properties['unoccupied_orbitals'] = unoccupied_orbitals
-    
+
 def thermal_energies(mol,line_number,line,output_lines,calculator):
     thermal_correction = float(line.split()[-1])
     enthalpy_correction = float(output_lines[line_number+1].split()[-1])
@@ -592,13 +593,13 @@ def non_opt(mol,line_number,line,output_lines,calculator):
     warning('''Non-Optimized Parameters - Gaussian did not converge the geometry for {0}
 
     The mol.warnings = ['Non-Optimized']
-    
+
     If this is an opt_freq job, it is reccomended to submit again using
     the 'oldchk' keyword with this calculation's .chk file and
     reading the force constants opt='readfc'
-    
+
     This calculation's .chk is {0}/{0}.chk
-    
+
     '''.format(calculator.jobname))
 
     mol.warnings.append('Non-Optimized')
@@ -607,10 +608,10 @@ def scf_error(mol,line_number,line,output_lines,calculator):
     warning('''SCF ERROR - Gaussian did not converge the energy for {0}
 
     The mol.warnings = ['SCF_Error']
-    
-    submitting with scf=qc is reccomended 
+
+    submitting with scf=qc is reccomended
     if you are confident in the input structure
-    
+
     '''.format(calculator.jobname))
 
     mol.warnings.append('SCF_Error')
@@ -630,7 +631,7 @@ def frequencies(mol,line_number,line,output_lines,calculator):
         freq_line_number += 7
         freq_line_number += mol.natoms
         freq_line = output_lines[freq_line_number]
-    
+
     freqs = np.array(freqs)
 
     mol.properties['frequencies'] = freqs
@@ -639,9 +640,9 @@ def frequencies(mol,line_number,line,output_lines,calculator):
         warning('''Saddle point found for {0}
 
         The mol.warnings = ['negative_frequency']
-        
+
         It's reccomended to resubmit reading the force constants in
-        
+
         '''.format(calculator.jobname))
 
         mol.warnings.append('saddle_point')
@@ -651,10 +652,10 @@ def frequencies(mol,line_number,line,output_lines,calculator):
             warning('''Negative frequency present for {0}
 
             The mol.warnings = ['negative_frequency']
-            
+
             Ignore if this is a TS, otherwise it's reccomended
             to resubmit reading the force constants in
-            
+
             '''.format(calculator.jobname))
 
             mol.warnings.append('negative_frequency')
@@ -676,7 +677,7 @@ def excited_states(mol,line_number,line,output_lines,calculator):
 
     line_number += 2 #get to the first Excited State line
     line = output_lines[line_number]
-    
+
     while re.search('Excited State',line):
         state_dict = {}
         line = line.split()
@@ -691,8 +692,8 @@ def excited_states(mol,line_number,line,output_lines,calculator):
         line = output_lines[line_number]
         transitions = []
         while re.search('->',line):
-            line = line.split()
-            transitions.append(('->'.join([line[0],line[2]]),float(line[3])))
+            line = re.split('\s*->\s*|\s+',line.strip())
+            transitions.append(('->'.join([line[0],line[1]]),float(line[2])))
             line_number += 1
             line = output_lines[line_number]
 
@@ -700,14 +701,14 @@ def excited_states(mol,line_number,line,output_lines,calculator):
         states.append(state_dict.copy())
 
         #find the next excited state line
-        #there is either a blank line, 
-        #or a message about the state for optimization, 
+        #there is either a blank line,
+        #or a message about the state for optimization,
         #then a blank line in between
 
         if re.search('This state for optimization',line):
             line_number += 4
             line = output_lines[line_number]
-        
+
         else:
             line_number += 1
             line = output_lines[line_number]
@@ -721,30 +722,30 @@ def steps_exceeded(mol,line_number,line,output_lines,calculator):
     warning('''Ran out of optimization steps for {0}
 
     The mol.warnings = ['Non-out_of_optimization_steps']
-    
+
     It's reccomended to resubmit with a smaller maxstep
     and with calculating force constants regularly
-    with recalcfc=10   
+    with recalcfc=10
 
     '''.format(calculator.jobname))
 
     mol.warnings.append('out_of_optimization_steps')
-    
-    
+
+
 def irc_missing_fc(mol,line_number,line,output_lines,calculator):
     warning('''IRC job needs force constrants either read in, or computed
-    
+
     The mol.warnings = ['IRC_without_fc']
-    
+
     The failure code will add calcfc to get these force constants if
     more than 1 try is requested''')
     mol.warnings.append('IRC_without_fc')
-    
+
 def irc_bad_corrector(mol,line_number,line,output_lines,calculator):
     warning('''IRC job failed
-    
+
     The mol.warnings = ['IRC_bad_corrector']
-    
+
     Using recorrect = never, reducing the stepsize, or calculating fc
     can help this''')
     mol.warnings.append('IRC_without_fc')
