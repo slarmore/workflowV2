@@ -184,7 +184,7 @@ class crest:
     def __init__(self,delete=['METADYN*','MRMSD','NORMMD*','*.tmp','wbo']):
         self.program_name = 'crest'
         self.infiles = ['{dir}{jobname}-try{try_count}.xyz','{dir}constrain.c','{dir}ref-try{try_count}.ref']
-        self.outfiles = ['out']
+        self.outfiles = ['{dir}{jobname}-try{try_count}.out']
         self.normal_termination_line = -1   #where to look to see if calculation was successful
         self.normal_termination_string = 'CREST terminated normally.'   #what to look for
         self.unessesary_files = delete
