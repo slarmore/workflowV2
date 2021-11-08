@@ -286,10 +286,8 @@ def confs(mol,line_number,line,output_lines,calculator):
                 x = float(x)
                 y = float(y)
                 z = float(z)
-                if atom == 'CL':
-                    atom = 'Cl'
-                elif atom == 'BR':
-                    atom = 'Br'
+                if len(atom) > 1:
+                    atom = atom[0] + atom[1:].lower()
                 xyz.append([atom,x,y,z])
                 atoms.append(atom)
                 coords.append([x,y,z])
