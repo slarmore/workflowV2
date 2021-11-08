@@ -183,7 +183,7 @@ class crest:
 #define attributes#
     def __init__(self,delete=['METADYN*','MRMSD','NORMMD*','*.tmp','wbo']):
         self.program_name = 'crest'
-        self.infiles = ['{dir}{jobname}-try{try_count}.xyz','constrain.c','ref-try{try_count}.ref']
+        self.infiles = ['{dir}{jobname}-try{try_count}.xyz','{dir}constrain.c','{dir}ref-try{try_count}.ref']
         self.outfiles = ['out']
         self.normal_termination_line = -1   #where to look to see if calculation was successful
         self.normal_termination_string = 'CREST terminated normally.'   #what to look for
