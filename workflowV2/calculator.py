@@ -45,10 +45,10 @@ class Calculator:
     #file io#
         self.dir = os.path.abspath(jobname) + '/'
         self.basename_full = self.dir +  self.jobname + '-try{0}'.format(try_count) 
-        self.inputfile_full = self.dir +  self.jobname + '-try{0}'.format(try_count) + '.' + self.program.infiles[0]
-        self.outputfile_full = self.dir +  self.jobname + '-try{0}'.format(try_count) + '.' + self.program.outfiles[0]
-        self.inputfile_relative = self.jobname + '-try{0}'.format(try_count) + '.' + self.program.infiles[0]
-        self.outputfile_relative = self.jobname + '-try{0}'.format(try_count) + '.' + self.program.outfiles[0]
+        self.input_file_full = self.program.infiles[0].format(dir=self.dir,jobname=self.jobname,try_count=self.try_count)
+        self.outputfile_full = self.program.outfiles[0].format(dir=self.dir, jobname=self.jobname, try_count=self.try_count)
+        self.inputfile_relative = self.program.infiles[0].format(dir='',jobname=self.jobname,try_count=self.try_count)
+        self.outputfile_relative = self.program.outfiles[0].format(dir='', jobname=self.jobname, try_count=self.try_count)
 
     ############
     #input file#
@@ -59,7 +59,7 @@ class Calculator:
             os.makedirs(self.dir)
 
         for index,content in enumerate(self.input):
-            with open('{0}/{1}-try{2}.{3}'.format(self.dir,self.jobname,self.try_count,self.program.infiles[index]),'w') as inputfile:
+            with open(self.program.infiles[index].format(dir=self.dir,jobname=self.jobname,try_count=self.try_count), 'w') as inputfile:
                 inputfile.write(content)
 
     ############

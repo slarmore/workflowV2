@@ -74,7 +74,7 @@ def CREST(mol,jobname,runtype,nproc=1,mem=1,time=default_time,partition=default_
     if len(mol.constraints) > 0:
         if not '-subrmsd' in arguments:
             arguments.append('-subrmsd')
-        arguments.append('-cinp {0}-try{1}.c'.format(jobname,try_count))
+        arguments.append('-cinp constrain.c'.format(jobname,try_count))
 
         constraintfile = ['$constrain']
         
@@ -97,7 +97,7 @@ def CREST(mol,jobname,runtype,nproc=1,mem=1,time=default_time,partition=default_
                 constrained_atoms.append(constraint[3]+1)
         
         constraintfile.append('force constant={0}'.format(crest_constraint_force_constrant))
-        constraintfile.append('reference={0}-try{1}.ref'.format(jobname,try_count))
+        constraintfile.append('reference=ref-try{0}.ref'.format(try_count))
         constraintfile.append('$metadyn')
 
         #get the list of atoms NOT constrained to include in the metadynamics
@@ -183,8 +183,8 @@ class crest:
 #define attributes#
     def __init__(self,delete=['METADYN*','MRMSD','NORMMD*','*.tmp','wbo']):
         self.program_name = 'crest'
-        self.infiles = ['xyz','c','ref']
-        self.outfiles = ['out']
+        self.infiles = ['{dir}{jobname}-try{try_count}.xyz','{dir}constrain.c','{dir}ref-try{try_count}.ref']
+        self.outfiles = ['{dir}{jobname}-try{try_count}.out']
         self.normal_termination_line = -1   #where to look to see if calculation was successful
         self.normal_termination_string = 'CREST terminated normally.'   #what to look for
         self.unessesary_files = delete
@@ -286,10 +286,8 @@ def confs(mol,line_number,line,output_lines,calculator):
                 x = float(x)
                 y = float(y)
                 z = float(z)
-                if atom == 'CL':
-                    atom = 'Cl'
-                elif atom == 'BR':
-                    atom = 'Br'
+                if len(atom) > 1:
+                    atom = atom[0] + atom[1:].lower()
                 xyz.append([atom,x,y,z])
                 atoms.append(atom)
                 coords.append([x,y,z])

@@ -234,8 +234,8 @@ class gaussian:
 #define attributes#
     def __init__(self,delete=['*.chk','Gau*']):
         self.program_name = 'gaussian'
-        self.infiles = ['com']
-        self.outfiles = ['log']
+        self.infiles = ['{dir}{jobname}-try{try_count}.com']
+        self.outfiles = ['{dir}{jobname}-try{try_count}.log']
         self.normal_termination_line = -1   #where to look to see if calculation was successful
         self.normal_termination_string = 'Normal termination of Gaussian'   #what to look for
         self.unessesary_files = delete
