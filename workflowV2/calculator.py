@@ -60,7 +60,7 @@ class Calculator:
 
         for index,content in enumerate(self.input):
             #with open('{0}/{1}-try{2}.{3}'.format(self.dir,self.jobname,self.try_count,self.program.infiles[index]),'w') as inputfile:
-            print(self.program.infiles[index])
+            log(self.program.infiles[index])
             with open(self.program.infiles[index].format(dir=self.dir,jobname=self.jobname,try_count=self.try_count), 'w') as inputfile:
                 inputfile.write(content)
 
