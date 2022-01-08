@@ -11,11 +11,11 @@ csv containing CREST, SinglePoint, fully optimized energies, and final relative 
 
 
 ## In this directory
-Script to run is called *conf_search_routine.sbatch*, and takes in an xyz file of the molecule to conformational search, as well as a number of arguments to control the workflow
+Script to run is called `conf_search_routine.sbatch`, and takes in an xyz file of the molecule to conformational search, as well as a number of arguments to control the workflow
 
-A test molecule file *testmol.xyz* is provided, as well as the file containing the arguments used for an example run (*args.txt*)
+A test molecule file `testmol.xyz` is provided, as well as the file containing the arguments used for an example run (`args.txt`)
 
-The results of an example run are in the *SampleResults* folder. 
+The results of an example run are in the `SampleResults` folder. 
 
 ## Running
 
