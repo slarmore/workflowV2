@@ -4,7 +4,9 @@ Performs CREST conformational search, followed by SinglePoint energy re-ranking,
 
 ## Output
 Lowest energy conformer xyz
+
 Lowest X conformers combined xyz
+
 csv containing CREST, SinglePoint, fully optimized energies, and final relative energies
 
 
