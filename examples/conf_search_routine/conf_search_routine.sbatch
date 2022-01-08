@@ -65,15 +65,6 @@ def conf_search(mol,method='B3LYP/6-31G',solvent=None,CREST_solvent=False,nproc=
         os.makedirs('CREST_conf_search',exist_ok=True)
         os.chdir('CREST_conf_search')
 
-        if solvent is not None:
-            if not CREST_solvent or CREST_solvent.lower() != 'none':
-                use_solvent = CREST_solvent
-            else:
-                use_solvent = False
-
-
-
-
         use_solvent = solvent  #default to the regular solvent key
         if CREST_solvent:      #unless the CREST_solvent is given
             if CREST_solvent.lower() == 'none':   #if the CREST_solvent is 'none', then remove solvent
