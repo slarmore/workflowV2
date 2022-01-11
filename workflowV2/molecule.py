@@ -352,22 +352,23 @@ class Conformer(FrozenClass):
 
     @atoms.setter
     def atoms(self,new_atoms):
-        self._atoms = new_atoms
+        self._atoms = np.array(new_atoms)
         self._natoms = len(new_atoms)
-        self.update_geometry()
+        if self._coords:
+            self.update_geometry()
+            self._coords = True
 
     @property
-    def coord(self):
-        return(self.coord)
+    def coords(self):
+        return(self._coords)
 
-    @coord.setter
-    def coord(self,new_coords):
+    @coords.setter
+    def coords(self,new_coords):
         if len(new_coords) != len(self.atoms):
             raise IndexError('Length of atoms is {0}, length of coords is {1}'.format(len(self.atoms),len(self.coords)))
 
         #make a numpy array of float points for consistency
-        self.coords = np.array(new_coords,dtype=np.float64)
-        log(type(self.coords[0][0]))
+        self._coords = np.array(new_coords,dtype=np.float64)
         self.update_geometry()
 
     @property
