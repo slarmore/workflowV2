@@ -1,0 +1,29 @@
+##################################################################
+Starting workflow at - 2022-01-10 23:29:49.308019
+##################################################################
+        
+Applying the following atom constraints:
+
+
+
+submitting - sbatch alanineglycine-confsearch-try0.sbatch - 2022-01-10 23:29:49.317591
+58 conformers found by CREST - 2022-01-10 23:35:19.556853
+submitting - sbatch alanineglycine-sp - 2022-01-10 23:35:21.264591
+submitting - sbatch alanineglycine-opt - 2022-01-10 23:38:45.430244
+WORKFLOW WARNING:
+2022-01-10 23:48:31.800953
+    Non-Optimized Parameters - Gaussian did not converge the geometry for alanineglycine-opt-2
+
+    The mol.warnings = ['Non-Optimized']
+
+    If this is an opt_freq job, it is reccomended to submit again using
+    the 'oldchk' keyword with this calculation's .chk file and
+    reading the force constants opt='readfc'
+
+    This calculation's .chk is alanineglycine-opt-2/alanineglycine-opt-2.chk
+
+    
+
+Fixed Non-Optimized Error - 2022-01-10 23:48:31.805718
+submitting - sbatch alanineglycine-opt - 2022-01-10 23:48:32.628691
+Done! - 2022-01-10 23:50:50.819027

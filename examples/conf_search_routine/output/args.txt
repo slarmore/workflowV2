@@ -1,0 +1,5 @@
+--xyz=alanineglycine.xyz
+--method=B3LYP/6-31G(d,p)
+--solvent=water
+--nproc=16
+--mem=120
