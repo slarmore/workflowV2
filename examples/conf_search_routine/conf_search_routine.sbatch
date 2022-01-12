@@ -65,6 +65,15 @@ def conf_search(mol,method='B3LYP/6-31G',solvent=None,CREST_solvent=False,nproc=
         os.makedirs('CREST_conf_search',exist_ok=True)
         os.chdir('CREST_conf_search')
 
+        if solvent is not None:
+            if not CREST_solvent or CREST_solvent.lower() != 'none':
+                use_solvent = CREST_solvent
+            else:
+                use_solvent = False
+            
+        
+
+
         use_solvent = solvent  #default to the regular solvent key
         if CREST_solvent:      #unless the CREST_solvent is given
             if CREST_solvent.lower() == 'none':   #if the CREST_solvent is 'none', then remove solvent
@@ -74,11 +83,11 @@ def conf_search(mol,method='B3LYP/6-31G',solvent=None,CREST_solvent=False,nproc=
 
         if use_solvent:
             conformer_calculator = CREST(mol,jobname=f'{name}-confsearch',runtype='confsearch',
-                                     gbsa=use_solvent,max_confs=max_confs,
+                                     gbsa=use_solvent,max_confs=max_confs,ewin=500,
                                      nproc=nproc,mem=mem,partition=partition,time=time)
         else:
             conformer_calculator = CREST(mol,jobname=f'{name}-confsearch',runtype='confsearch',
-                                     max_confs=max_confs,
+                                     max_confs=max_confs,ewin=500,
                                      nproc=nproc,mem=mem,partition=partition,time=time)
 
 
@@ -89,10 +98,13 @@ def conf_search(mol,method='B3LYP/6-31G',solvent=None,CREST_solvent=False,nproc=
         #checkpoint the workflow
         os.chdir('../')
 
+        #write out all conformers
+        mol.ConformersToXYZ(f'{name}-allconfs.xyz')
+
         #Write out a table of conformer energies
         conf_energy_pairs = [[idx,conf.energy] for idx,conf in enumerate(mol.conformers)]
         df = pd.DataFrame(conf_energy_pairs,columns=['CREST_Conformer','CREST_energy'])
-        df.to_csv(csv,index=False)
+        df.to_csv(csv,index=False) 
 
         mol.tags['step'] = 1
         mol.checkpoint(chk)
@@ -123,7 +135,7 @@ def conf_search(mol,method='B3LYP/6-31G',solvent=None,CREST_solvent=False,nproc=
 
         #Get mapping of CREST_conformer -> re-ranked_conformer
         conf_mapping = {conf.tags['CREST_Conformer']:idx for idx,conf in enumerate(mol.conformers)}
-
+   
         for idx,conf in enumerate(mol.conformers):
             conf.tags['Re-Ranked_Conformer'] = idx   #add an idx tag to track where it ends up after reshuffling
 
@@ -136,7 +148,7 @@ def conf_search(mol,method='B3LYP/6-31G',solvent=None,CREST_solvent=False,nproc=
         df.sort_values(['Re-Ranked_Conformer','CREST_Conformer'],inplace=True)
         df['Re-Ranked_SP_Energy'] = [conf.properties['electronic_energy'] for conf in mol.conformers]
         df.to_csv(csv,index=False)
-
+          
         mol.tags['step'] = 2
         mol.checkpoint(chk)
 
@@ -187,7 +199,7 @@ def conf_search(mol,method='B3LYP/6-31G',solvent=None,CREST_solvent=False,nproc=
         mol.tags['step'] = 3
         mol.checkpoint(name + '.chk')
 
-
+ 
     ################################################################
     # Write output
     if mol.tags['step'] < 4:
