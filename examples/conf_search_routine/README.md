@@ -2,7 +2,7 @@
 
 Performs CREST conformational search, followed by SinglePoint energy re-ranking, and full optimization of X lowest energy conformers
 
-*Caveats as always* - This generalized script assumes CREST won't have any trouble covering the full conformational space of your input structure! You should always check the conformers that come out of this routine for missing conformers you should expect. It is also a good idea to run multiple tests to verify that CREST's output conformers are reprodudible for your molecule. 
+**Caveats as always** - This generalized script assumes CREST won't have any trouble covering the full conformational space of your input structure! You should always check the conformers that come out of this routine for missing conformers you should expect. It is also a good idea to run multiple tests to verify that CREST's output conformers are reprodudible for your molecule. 
 
 If you're molecule has a huge conformational space or isn't getting consistent results from CREST, we can assess and make a tool better suited for your specific needs.
 
@@ -14,6 +14,7 @@ Lowest X conformers combined xyz
 All conformers combined xyz
 
 csv containing CREST, SinglePoint, fully optimized energies, and final relative energies
+<img src="csv_head.png" width="75%" align="middle" />
 
 
 
@@ -93,9 +94,6 @@ Submitted with
 `sbatch conf_search_routine.sbatch @args.txt`
 
 This example will run a CREST conformational search on the molecule in testmol.xyz in gas phase with the 10,9,8,2 atom dihedral constrained, then re-rank the conformers by B3LYP/6-31G(d,p) IEFPCM(water) SinglePoint energy, and finally fully optimize the 10 lowest energy conformers with B3LYP/6-31G(d,p) IEFPCM(water)
-
-Top of the output csv is shown below:
-![Example_csv](example_csv.png)
 
 
 
