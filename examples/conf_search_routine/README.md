@@ -14,7 +14,7 @@ Lowest X conformers combined xyz
 All conformers combined xyz
 
 csv containing CREST, SinglePoint, fully optimized energies, and final relative energies
-<img src="csv_head.png" width="75%" align="middle" />
+<img src="csv_head.PNG" width="75%" align="middle" />
 
 
 
