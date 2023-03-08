@@ -17,7 +17,7 @@ import os
 
 ########################################################################################################
 #calculator creation function
-def CREST(mol,jobname,runtype,nproc=1,mem=1,time=default_time,partition=default_partition,max_confs=500,try_count=0,delete=['METADYN*','MRMSD','NORMMD*','*.tmp','wbo'],**kwargs):
+def CREST(mol,jobname,runtype,nproc=1,mem=1,time=default_time,partition=default_partition,max_confs=500,try_count=0,delete=['METADYN*','MRMSD','NORMMD*','*.tmp','wbo'],force_constant=1.0,**kwargs):
     '''Create calculator object for CREST conformer generation'''
     
 
@@ -96,7 +96,7 @@ def CREST(mol,jobname,runtype,nproc=1,mem=1,time=default_time,partition=default_
                 constrained_atoms.append(constraint[2]+1)
                 constrained_atoms.append(constraint[3]+1)
         
-        constraintfile.append('force constant={0}'.format(crest_constraint_force_constrant))
+        constraintfile.append('force constant={0}'.format(force_constant))
         constraintfile.append('reference=ref-try{0}.ref'.format(try_count))
         constraintfile.append('$metadyn')
 
