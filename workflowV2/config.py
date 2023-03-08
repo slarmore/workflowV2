@@ -8,6 +8,3 @@ g16root = '/work/lopez/'
 default_partition = 'short'
 default_time = '1-00:00:00'
 
-#CREST SPECIFIC SETTINGS
-crest_constraint_force_constrant = 1.0
-
