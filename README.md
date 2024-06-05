@@ -49,7 +49,7 @@ dependencies:
   - rdkit
   - pip
   - pip:
-    - git+https://github.com/neal-p/workflowV2.git
+    - git+https://github.com/slarmore/workflowV2.git
  ```
  Create the environment with the bash command:\
  `conda env create -f workflowV2.yml`
