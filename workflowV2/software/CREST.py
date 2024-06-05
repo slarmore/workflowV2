@@ -51,7 +51,9 @@ def CREST(mol,jobname,runtype,nproc=1,mem=1,time=default_time,partition=default_
 
     arguments = ['-verbose']            #start with keywords always used
     for key, value in kwargs.items():
-        if key in supported_runtypes[runtype]:
+        if key in locals():            # Allows modification of some default variables in the function
+            locals()[key] = value
+        elif key in supported_runtypes[runtype]:
             if isinstance(value,bool):
                 if value:                                  #if the option is set to True, include it, otherwise don't
                     arguments.append('-{0}'.format(key))
@@ -81,20 +83,20 @@ def CREST(mol,jobname,runtype,nproc=1,mem=1,time=default_time,partition=default_
         constrained_atoms = []
         for constraint in mol.constraints:
             if len(constraint) == 2:
-                constraintfile.append('distance: {0}, {1}, auto'.format(constraint[0]+1,constraint[1]+1))
-                constrained_atoms.append(constraint[0]+1)
-                constrained_atoms.append(constraint[1]+1)
+                constraintfile.append('distance: {0}, {1}, auto'.format(constraint[0],constraint[1]))
+                constrained_atoms.append(constraint[0])
+                constrained_atoms.append(constraint[1])
             elif len(constraint) == 3:
-                constraintfile.append('angle: {0}, {1}, {2}, auto'.format(constraint[0]+1,constraint[1]+1,constraint[2]+1))
-                constrained_atoms.append(constraint[0]+1)
-                constrained_atoms.append(constraint[1]+1)
-                constrained_atoms.append(constraint[2]+1)
+                constraintfile.append('angle: {0}, {1}, {2}, auto'.format(constraint[0],constraint[1],constraint[2]))
+                constrained_atoms.append(constraint[0])
+                constrained_atoms.append(constraint[1])
+                constrained_atoms.append(constraint[2])
             elif len(constraint) == 4:
-                constraintfile.append('dihedral: {0}, {1}, {2}, {3}, auto'.format(constraint[0]+1,constraint[1]+1,constraint[2]+1,constraint[3]+1))
-                constrained_atoms.append(constraint[0]+1)
-                constrained_atoms.append(constraint[1]+1)
-                constrained_atoms.append(constraint[2]+1)
-                constrained_atoms.append(constraint[3]+1)
+                constraintfile.append('dihedral: {0}, {1}, {2}, {3}, auto'.format(constraint[0],constraint[1],constraint[2],constraint[3]))
+                constrained_atoms.append(constraint[0])
+                constrained_atoms.append(constraint[1])
+                constrained_atoms.append(constraint[2])
+                constrained_atoms.append(constraint[3])
         
         constraintfile.append('force constant={0}'.format(force_constant))
         constraintfile.append('reference=ref-try{0}.ref'.format(try_count))
