@@ -47,32 +47,32 @@ def GAUSSIAN(mol,jobname,runtype,method,nproc=1,mem=1,time=default_time,partitio
 #parse calculation keywords#
 
     #check for constraints
-    if len(mol.constraints) > 0:
-        constraint_string = []
-        for constraint in mol.constraints:
-            if len(constraint) == 1:
-                constraint_string.append('X {0} F'.format(constraint[0]+1))
-            elif len(constraint) == 2:
-                constraint_string.append('B {0} {1} F'.format(constraint[0]+1,constraint[1]+1))
-            elif len(constraint) == 3:
-                constraint_string.append('A {0} {1} {2} F'.format(constraint[0]+1,constraint[1]+1,constraint[2]+1))
-            elif len(constraint) == 4:
-                constraint_string.append('D {0} {1} {2} {3} F'.format(constraint[0]+1,constraint[1]+1,constraint[2]+1,constraint[3]+1))
+    #if len(mol.constraints) > 0:
+    #    constraint_string = []
+    #    for constraint in mol.constraints:
+    #        if len(constraint) == 1:
+    #            constraint_string.append('X {0} F'.format(constraint[0]+1))
+    #        elif len(constraint) == 2:
+    #            constraint_string.append('B {0} {1} F'.format(constraint[0]+1,constraint[1]+1))
+    #        elif len(constraint) == 3:
+    #            constraint_string.append('A {0} {1} {2} F'.format(constraint[0]+1,constraint[1]+1,constraint[2]+1))
+    #        elif len(constraint) == 4:
+    #            constraint_string.append('D {0} {1} {2} {3} F'.format(constraint[0]+1,constraint[1]+1,constraint[2]+1,constraint[3]+1))
 
-        constraint_string = '\n'.join(constraint_string)
+    #    constraint_string = '\n'.join(constraint_string)
 
-        if runtype in ['opt','opt_freq']:
-            if 'opt' in kwargs:
-                current = kwargs['opt']
-                if not re.search('modredundant',current,re.IGNORECASE):
-                    kwargs['opt'] = current + ' modredundant'
-            else:
-                kwargs['opt'] = 'modredundant'
+    #    if runtype in ['opt','opt_freq']:
+    #        if 'opt' in kwargs:
+    #            current = kwargs['opt']
+    #            if not re.search('modredundant',current,re.IGNORECASE):
+    #                kwargs['opt'] = current + ' modredundant'
+    #        else:
+    #            kwargs['opt'] = 'modredundant'
 
-        if 'afterinput' in kwargs:
-            kwargs['afterinput'] += constraint_string
-        else:
-            kwargs['afterinput'] = constraint_string
+    #    if 'afterinput' in kwargs:
+    #        kwargs['afterinput'] += constraint_string
+    #    else:
+    #        kwargs['afterinput'] = constraint_string
 
     #if no arguments for the base runtype, set to default
     maintypes = runtype.split('_')               #expects multicomponent jobs to be called by STEP1_STEP2 (ie opt_freq)
