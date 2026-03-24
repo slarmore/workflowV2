@@ -99,25 +99,6 @@ def CREST(mol,jobname,runtype,nproc=1,mem=1,time=default_time,partition=default_
                 constrained_atoms.append(constraint[3])
         
         constraintfile.append('force constant={0}'.format(force_constant))
-        constraintfile.append('reference=ref-try{0}.ref'.format(try_count))
-        constraintfile.append('$metadyn')
-
-        #get the list of atoms NOT constrained to include in the metadynamics
-        missing = []
-        constrained_atoms = list(set(constrained_atoms))
-        constrained_atoms.sort()
-        numbers = constrained_atoms
-        numbers.insert(0,0) # add the minimum value on begining of the list
-        numbers.append(mol.natoms+1)  # add the maximum value at the end of the list
-        for rank in range(0, len(numbers)-1):
-            if numbers[rank+1] - numbers[rank] > 2:
-                missing.append("%s-%s"%(numbers[rank] +1 , numbers[rank+1] - 1))
-            elif numbers[rank+1] - numbers[rank] == 2:
-                missing.append(str(numbers[rank]+1))
-        missing = str(missing)[1:-1]
-        include = missing.replace("'","")
-
-        constraintfile.append('atoms: {0}'.format(include))
 
         constraintfile.append('$end')
         constraintfile = '\n'.join(constraintfile)
@@ -147,7 +128,7 @@ def CREST(mol,jobname,runtype,nproc=1,mem=1,time=default_time,partition=default_
 
     #execution command
 
-    command = 'ulimit -s unlimited\nexport OMP_STACKSIZE={0}G\nexport OMP_NUM_THREADS={1},1\n{2} INPUTFILE -xnam {3} -T {1} {4} > OUTPUTFILE'.format(mem,nproc,crest_exe,xtb_exe,arguments,jobname,try_count)
+    command = 'ulimit -s unlimited\nexport OMP_STACKSIZE={0}G\nexport OMP_NUM_THREADS={1},1\n{2} INPUTFILE -xnam {3} -T {1} --gfn 2 {4} > OUTPUTFILE'.format(mem,nproc,crest_exe,xtb_exe,arguments,jobname,try_count)
 
 
 ##########################################################
