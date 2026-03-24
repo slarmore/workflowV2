@@ -1,6 +1,6 @@
 #EXE FILES - required to run a calculation with the program
-crest_exe = '/projects/lopez/share_from_Sean/software/xtb-6.7.1/crest'
-xtb_exe = '/projects/lopez/share_from_Sean/software/xtb-6.7.1/bin'
+crest_exe = '/projects/lopez/share_from_Sean/software/xtb-6.7.1/crest/crest'
+xtb_exe = '/projects/lopez/share_from_Sean/software/xtb-6.7.1/bin/xtb'
 g16root = '/projects/lopez/'
 
 
