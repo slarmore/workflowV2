@@ -250,7 +250,9 @@ def confs(mol,line_number,line,output_lines,calculator):
                 warning('CREST generated more than the max_conformers ({0}), only retaining the lowest {0}'.format(max_conformers))
                 nconfs = max_conformers
 
-    energies = [float(confline.split()[-1]) for confline in output_lines[line_number+1:line_number+1+nconfs]]
+    #Read conf energies from crest.energies files
+    with open(f"{calculator.dir}/crest.energies", "r") as f:
+        energies = [float(line.split()[-1]) for line in f.readlines()[:nconfs]]
  
     with open('{0}/crest_conformers.xyz'.format(calculator.dir),'r') as conformerfile:
         conformerslines = conformerfile.read().splitlines()
